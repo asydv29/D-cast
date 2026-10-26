@@ -70,6 +70,9 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .pg{padding:18px 16px 100px}.hero{grid-template-columns:1fr}.hero p{font-size:15px}
 .cta button{flex:1;justify-content:center;padding:16px 14px;font-size:16px;white-space:nowrap}
 .dg{grid-template-columns:1fr}.cg{grid-template-columns:1fr 1fr}.cc{padding:12px;gap:10px}.ct{width:48px;height:48px;border-radius:12px}.ct svg{width:26px;height:26px}.cc>svg{display:none}.cc b{font-size:16px}}
+input[type=url]{flex:1;min-width:160px;background:#0b1224;color:var(--text);border:1px solid #26365a;border-radius:20px;padding:10px 14px;font:inherit;font-size:14px}
+#ytbox{aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden}#ytbox iframe{width:100%;height:100%;display:block;border:0}
+#ytcard b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 [hidden]{display:none!important}
 </style></head><body>
 
@@ -124,10 +127,14 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke
   <button class="back" data-home>← Home</button>
   <div id="unsup" class="hint" hidden>This browser can't cast video. Please use Chrome.</div>
   <div id="hmain" hidden>
-  <h2>Choose videos</h2>
+  <h2>Add videos</h2>
   <div class="row"><button class="main" id="pickbtn">Choose videos…</button>
-  <input id="pick" type="file" accept="video/*" multiple hidden></div>
+  <input id="pick" type="file" accept="video/*" multiple hidden>
+  <button id="clrbtn">Clear list</button></div>
+  <div class="row"><input id="urlin" type="url" inputmode="url" placeholder="Paste a YouTube or video link…" autocomplete="off"><button class="main" id="urlbtn">🌐 Add link</button></div>
+  <p class="hint">Mix device videos and web links in one list. <b>YouTube</b> links play on the receiving device (it needs internet). Other links must point straight to a video file (.mp4, .webm) from a site that allows sharing.</p>
   <video id="hv" controls playsinline></video>
+  <div id="ytcard" class="card" hidden><b id="ytt"></b><p class="hint" id="yts"></p><div class="row"><button id="ytpp">⏯ Play / Pause</button></div></div>
   <div class="pl" id="hlist"></div>
   </div>
 
@@ -179,6 +186,7 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke
   </div>
   <div id="vplay" hidden>
     <video id="rv" autoplay playsinline></video>
+    <div id="ytbox" hidden><div id="ytp"></div></div>
     <div class="row"><button id="pp">⏯</button><input id="seek" type="range" min="0" max="1" step="0.1" value="0"><span id="tm" class="hint">0:00</span></div>
     <div class="row"><button id="pv">⏮ Prev</button><button id="nx">Next ⏭</button><button id="fs">⛶ Full screen</button></div>
     <div class="pl" id="vlist"></div>
@@ -1163,7 +1171,7 @@ async function iceDrain(p){while(p.q&&p.q.length)try{await p.pc.addIceCandidate(
 function waitReply(o,get,msg){const t=setTimeout(()=>{if(!o.closed&&!get())msg()},15000);return()=>clearTimeout(t)}
 
 // ================= HOST (plays + casts to many devices) =================
-const hv=$('#hv');let files=[],cur=-1,cap,peers=[],pend=null;
+const hv=$('#hv');let files=[],cur=-1,cap,peers=[],pend=null,ytS=null,ytEnd=false;
 function startHost(){
   if(cap)return;cap=(hv.captureStream||hv.mozCaptureStream||(()=>null)).call(hv);
   if(!cap||!window.RTCPeerConnection){$('#unsup').hidden=false;return}
@@ -1172,13 +1180,53 @@ function startHost(){
 }
 function attach(){if(!cap)return;peers.forEach(p=>cap.getTracks().forEach(t=>{const s=p.snd[t.kind];if(s&&s.track!==t){if(t.kind==='video')t.contentHint='motion';s.replaceTrack(t)}}))}
 $('#pickbtn').onclick=()=>$('#pick').click();
-$('#pick').onchange=e=>{files=[...e.target.files];rList();if(files.length)go(0);send(true)};
+$('#pick').onchange=e=>{const n=files.length;files.push(...[...e.target.files].map(f=>({k:'f',file:f,name:f.name})));e.target.value='';rList();if(cur<0&&files.length>n)go(n);else send(true)};
 function rList(){$('#hlist').innerHTML=files.map((f,i)=>`<div class="${i===cur?'on':''}" data-i="${i}">${esc(f.name)}</div>`).join('')}
 $('#hlist').onclick=e=>{const i=e.target.dataset.i;if(i!=null)go(+i)};
-function go(i){if(i<0||i>=files.length)return;cur=i;if(hv.src)URL.revokeObjectURL(hv.src);hv.src=URL.createObjectURL(files[i]);hv.play().catch(()=>{});rList();send(true)}
+const yIs=()=>{const it=files[cur];return !!it&&it.k==='y'};
+function ytTx(m,only){const j=JSON.stringify(m);(only?[only]:peers).forEach(p=>p.dc.readyState==='open'&&p.dc.send(j))}
+function go(i){if(i<0||i>=files.length)return;cur=i;const it=files[i];ytS=null;ytEnd=false;
+  if(hv.src.startsWith('blob:'))URL.revokeObjectURL(hv.src);
+  if(it.k==='y'){hv.pause();hv.removeAttribute('src');hv.load();hv.hidden=true;$('#ytcard').hidden=false;$('#ytt').textContent=it.name;$('#yts').textContent='Starting on the receiver…';ytTx({yx:'load',id:it.id,s:it.s||0})}
+  else{if(!$('#ytcard').hidden)ytTx({yx:'stop'});$('#ytcard').hidden=true;hv.hidden=false;
+    if(it.k==='u'&&!it.nocors)hv.crossOrigin='anonymous';else hv.removeAttribute('crossorigin');
+    hv.src=it.k==='f'?URL.createObjectURL(it.file):it.url;hv.play().catch(()=>{})}
+  rList();send(true)}
 hv.onended=()=>go(cur+1);
-function send(full,only){const m=JSON.stringify({n:full?files.map(f=>f.name):undefined,i:cur,t:hv.currentTime||0,d:hv.duration||0,p:hv.paused});
+hv.onerror=()=>{const it=files[cur];if(!it||it.k!=='u'||!hv.getAttribute('src'))return;
+  if(!it.nocors){it.nocors=true;hv.removeAttribute('crossorigin');hv.src=it.url;hv.play().catch(()=>{});toast('That site blocks casting its video, so it plays on this device only.')}
+  else toast('Couldn\'t play this link. Use a YouTube link or a direct video file link.')};
+$('#clrbtn').onclick=()=>{if(yIs())ytTx({yx:'stop'});files=[];cur=-1;ytS=null;hv.pause();hv.removeAttribute('src');hv.load();hv.hidden=false;$('#ytcard').hidden=true;rList();send(true)};
+function send(full,only){const y=yIs(),m=JSON.stringify({n:full?files.map(f=>f.name):undefined,i:cur,t:y?(ytS?ytS.t:0):(hv.currentTime||0),d:y?(ytS?ytS.d:0):(hv.duration||0),p:y?(ytS?ytS.p:true):hv.paused});
   (only?[only]:peers).forEach(p=>p.dc.readyState==='open'&&p.dc.send(m))}
+
+// ---- web links: YouTube plays on the receiver (official embed); direct video files stream through the sender
+function ytId(x){const h=x.hostname.replace(/^(www|m|music)\./,'');let v=null;
+  if(h==='youtu.be')v=x.pathname.slice(1).split('/')[0];
+  else if(h==='youtube.com'||h==='youtube-nocookie.com'){if(x.pathname==='/watch')v=x.searchParams.get('v');else{const m=/^\/(shorts|embed|live|v)\/([\w-]{11})/.exec(x.pathname);v=m&&m[2]}}
+  return v&&/^[\w-]{11}$/.test(v)?v:null}
+function ytStart(x){const t=x.searchParams.get('t')||x.searchParams.get('start');if(!t)return 0;if(/^\d+s?$/.test(t))return parseInt(t);
+  const m=/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/.exec(t);return m?(+m[1]||0)*3600+(+m[2]||0)*60+(+m[3]||0):0}
+async function addUrl(){let u=$('#urlin').value.trim();if(!u)return;if(!/^[a-z]+:\/\//i.test(u))u='https://'+u;
+  let x;try{x=new URL(u)}catch{toast('That isn\'t a valid link');return}
+  if(!/^https?:$/.test(x.protocol)){toast('Use an http or https link');return}
+  if(location.protocol==='https:'&&x.protocol==='http:')x.protocol='https:';
+  const id=ytId(x);let it;
+  if(id){toast('Checking video…');let title='';
+    try{const c=new AbortController(),tm=setTimeout(()=>c.abort(),4000);
+      const r=await fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+id),{signal:c.signal});clearTimeout(tm);
+      if(r.status===401||r.status===403||r.status===404){toast('This video can\'t be cast (private, removed, or embedding is turned off)');return}
+      if(r.ok)title=(await r.json()).title||''}catch{}
+    it={k:'y',id,s:ytStart(x),name:'▶ '+(title||'YouTube video ('+id+')')}}
+  else{let n=x.hostname;try{n=decodeURIComponent(x.pathname.split('/').filter(Boolean).pop()||x.hostname)}catch{}it={k:'u',url:x.href,name:'🌐 '+n}}
+  files.push(it);$('#urlin').value='';rList();if(cur<0)go(files.length-1);else send(true)}
+$('#urlbtn').onclick=addUrl;$('#urlin').onkeydown=e=>{if(e.key==='Enter')addUrl()};
+const YE={101:'The video owner doesn\'t allow it to play outside YouTube.',150:'The video owner doesn\'t allow it to play outside YouTube.',100:'This video isn\'t available.',2:'That video link isn\'t valid.',5:'The receiver couldn\'t play this video.',net:'The receiver can\'t reach YouTube. It needs internet.'};
+function ytIn(m){if(!yIs())return;
+  if(m.yx==='st'){if(m.v!==files[cur].id)return;ytS={t:m.t,d:m.d,p:m.p};$('#yts').textContent=(m.p?'Paused':'Playing')+' on the receiver · '+fmt(m.t)+' / '+fmt(m.d);send(false);
+    if(m.e&&!ytEnd){ytEnd=true;go(cur+1)}}
+  else if(m.yx==='err')$('#yts').textContent=YE[m.c]||YE[5]}
+$('#ytpp').onclick=()=>ytTx({yx:ytS&&ytS.p===false?'pause':'play'});
 setInterval(()=>send(false),500);hv.onpause=hv.onplay=()=>send(false);
 function status(){const n=peers.filter(p=>p.pc.connectionState==='connected').length;
   $('#st').textContent=n?`✅ ${n} device${n>1?'s':''} watching. Show or scan a QR to add another.`:(pend?'Waiting for the other device…':'No devices connected yet')}
@@ -1187,9 +1235,9 @@ function newPeer(cfg){
   try{v.setCodecPreferences(RTCRtpSender.getCapabilities('video').codecs.filter(c=>c.mimeType==='video/VP8'));
       a.setCodecPreferences(RTCRtpSender.getCapabilities('audio').codecs.filter(c=>c.mimeType==='audio/opus'))}catch{}
   const p={pc,snd:{video:v.sender,audio:a.sender}};
-  p.dc=pc.createDataChannel('ctl');p.dc.onopen=()=>send(true,p);
-  p.dc.onmessage=e=>{const m=JSON.parse(e.data);
-    if(m.c==='play')hv.play();else if(m.c==='pause')hv.pause();else if(m.c==='seek')hv.currentTime=m.t;else if(m.c==='go')go(m.i)};
+  p.dc=pc.createDataChannel('ctl');p.dc.onopen=()=>{send(true,p);const it=files[cur];if(it&&it.k==='y')ytTx({yx:'load',id:it.id,s:ytS?ytS.t:(it.s||0)},p)};
+  p.dc.onmessage=e=>{const m=JSON.parse(e.data);if(m.yx){ytIn(m);return}
+    if(m.c==='play'){yIs()?ytTx({yx:'play'}):hv.play()}else if(m.c==='pause'){yIs()?ytTx({yx:'pause'}):hv.pause()}else if(m.c==='seek'){yIs()?ytTx({yx:'seek',t:m.t}):hv.currentTime=m.t}else if(m.c==='go')go(m.i)};
   pc.onconnectionstatechange=async()=>{const s=pc.connectionState;
     if(s==='connected'){try{const q=p.snd.video.getParameters();if(!q.encodings||!q.encodings.length)q.encodings=[{}];q.encodings[0].maxBitrate=5e6;await p.snd.video.setParameters(q)}catch{}
       $('#hmain').hidden=false;if(p.o)p.o.close();if(pend===p){pend=null;$('#pair').hidden=true;$('#pairOn').hidden=true;$('#offer').value='';$('#ansIn').value=''}}
@@ -1265,7 +1313,7 @@ $('#scanOff').onclick=()=>scan('Scan the QR on the other device',viewScan);
 $('#vshow').onclick=()=>viewPair(rid(),true);
 $('#mkAns').onclick=()=>takeOffer($('#offIn').value);
 const cmd=o=>vdc&&vdc.readyState==='open'&&vdc.send(JSON.stringify(o));let paused=false;
-function onState(e){const m=JSON.parse(e.data);paused=m.p;
+function onState(e){const m=JSON.parse(e.data);if(m.yx){ytRecv(m);return}paused=m.p;
   if(m.n){$('#vlist').innerHTML=m.n.map((n,i)=>`<div data-i="${i}">${esc(n)}</div>`).join('')}
   document.querySelectorAll('#vlist div').forEach((d,i)=>d.classList.toggle('on',i===m.i));
   if(!drag){$('#seek').max=m.d||1;$('#seek').value=m.t}$('#tm').textContent=fmt(m.t)+' / '+fmt(m.d);
@@ -1276,7 +1324,27 @@ $('#seek').onchange=e=>{drag=false;cmd({c:'seek',t:+e.target.value})};
 $('#vlist').onclick=e=>{const i=e.target.dataset.i;if(i!=null)cmd({c:'go',i:+i})};
 const idx=()=>[...document.querySelectorAll('#vlist div')].findIndex(d=>d.classList.contains('on'));
 $('#pv').onclick=()=>cmd({c:'go',i:idx()-1});$('#nx').onclick=()=>cmd({c:'go',i:idx()+1});
-$('#fs').onclick=()=>(rv.requestFullscreen||rv.webkitRequestFullscreen||(()=>{})).call(rv);
+$('#fs').onclick=()=>{const t=$('#ytbox').hidden?rv:$('#ytbox');(t.requestFullscreen||t.webkitRequestFullscreen||(()=>{})).call(t)};
+
+// YouTube on the receiver: official embedded player, driven by the sender
+let yp=null,ytOk=false,ytReady=null,ytTimer=null,ytWant=null,ytAt=0;
+const ytBack=o=>vdc&&vdc.readyState==='open'&&vdc.send(JSON.stringify(o));
+function ytAPI(){return ytReady||(ytReady=new Promise((res,rej)=>{if(window.YT&&YT.Player)return res();window.onYouTubeIframeAPIReady=res;
+  const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>{ytReady=null;rej()};document.head.appendChild(s)}))}
+function ytShow(on){$('#ytbox').hidden=!on;rv.hidden=on}
+async function ytRecv(m){
+  if(m.yx==='stop'){clearInterval(ytTimer);ytWant=null;if(ytOk)yp.pauseVideo();ytShow(false);rv.play().catch(()=>{});return}
+  if(m.yx==='load'){ytWant=m;ytAt=Date.now();rv.pause();ytShow(true);
+    try{await ytAPI()}catch{ytBack({yx:'err',c:'net'});return}
+    if(!ytWant)return;
+    if(ytOk)yp.loadVideoById({videoId:m.id,startSeconds:m.s||0});
+    else if(!yp)yp=new YT.Player('ytp',{width:'100%',height:'100%',playerVars:{playsinline:1,rel:0,autoplay:1},events:{
+      onReady:()=>{ytOk=true;if(ytWant)yp.loadVideoById({videoId:ytWant.id,startSeconds:ytWant.s||0})},onError:e=>ytBack({yx:'err',c:e.data})}});
+    clearInterval(ytTimer);ytTimer=setInterval(ytReport,500);return}
+  if(!ytOk)return;
+  if(m.yx==='play')yp.playVideo();else if(m.yx==='pause')yp.pauseVideo();else if(m.yx==='seek')yp.seekTo(m.t,true)}
+function ytReport(){if(!ytOk||!ytWant)return;const s=yp.getPlayerState();
+  ytBack({yx:'st',v:ytWant.id,t:yp.getCurrentTime()||0,d:yp.getDuration()||0,p:!(s===1||s===3),e:s===0&&Date.now()-ytAt>2500})}
 
 // ================= HOME SCREEN =================
 const ICO=n=>`<svg class="i"><use href="#i-${n}"/></svg>`;
