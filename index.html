@@ -73,6 +73,7 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke
 input[type=url]{flex:1;min-width:160px;background:#0b1224;color:var(--text);border:1px solid #26365a;border-radius:20px;padding:10px 14px;font:inherit;font-size:14px}
 #ytbox{aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden}#ytbox iframe{width:100%;height:100%;display:block;border:0}
 #ytcard b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#spbox{aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;margin-bottom:8px;pointer-events:none}#spbox iframe{width:100%;height:100%;display:block;border:0}
 [hidden]{display:none!important}
 </style></head><body>
 
@@ -134,7 +135,7 @@ input[type=url]{flex:1;min-width:160px;background:#0b1224;color:var(--text);bord
   <div class="row"><input id="urlin" type="url" inputmode="url" placeholder="Paste a YouTube or video link…" autocomplete="off"><button class="main" id="urlbtn">🌐 Add link</button></div>
   <p class="hint">Mix device videos and web links in one list. <b>YouTube</b> links play on the receiving device (it needs internet). Other links must point straight to a video file (.mp4, .webm) from a site that allows sharing.</p>
   <video id="hv" controls playsinline></video>
-  <div id="ytcard" class="card" hidden><b id="ytt"></b><p class="hint" id="yts"></p><div class="row"><button id="ytpp">⏯ Play / Pause</button></div></div>
+  <div id="ytcard" class="card" hidden><div id="spbox"><div id="spp"></div></div><b id="ytt"></b><p class="hint" id="yts"></p><div class="row"><button id="ytpp">⏯ Play / Pause</button></div></div>
   <div class="pl" id="hlist"></div>
   </div>
 
@@ -1187,8 +1188,8 @@ const yIs=()=>{const it=files[cur];return !!it&&it.k==='y'};
 function ytTx(m,only){const j=JSON.stringify(m);(only?[only]:peers).forEach(p=>p.dc.readyState==='open'&&p.dc.send(j))}
 function go(i){if(i<0||i>=files.length)return;cur=i;const it=files[i];ytS=null;ytEnd=false;
   if(hv.src.startsWith('blob:'))URL.revokeObjectURL(hv.src);
-  if(it.k==='y'){hv.pause();hv.removeAttribute('src');hv.load();hv.hidden=true;$('#ytcard').hidden=false;$('#ytt').textContent=it.name;$('#yts').textContent='Starting on the receiver…';ytTx({yx:'load',id:it.id,s:it.s||0})}
-  else{if(!$('#ytcard').hidden)ytTx({yx:'stop'});$('#ytcard').hidden=true;hv.hidden=false;
+  if(it.k==='y'){hv.pause();hv.removeAttribute('src');hv.load();hv.hidden=true;$('#ytcard').hidden=false;$('#ytt').textContent=it.name;$('#yts').textContent='Starting on the receiver…';ytTx({yx:'load',id:it.id,s:it.s||0});spLoad(it);const c=i;setTimeout(()=>{if(cur===c&&!ytS&&$('#yts').textContent==='Starting on the receiver…')$('#yts').textContent='No response from the receiver. Fully close and reopen D Cast on that device (it may be an older version), and check it has internet.'},6000)}
+  else{if(!$('#ytcard').hidden)ytTx({yx:'stop'});if(spOk)sp.pauseVideo();$('#ytcard').hidden=true;hv.hidden=false;
     if(it.k==='u'&&!it.nocors)hv.crossOrigin='anonymous';else hv.removeAttribute('crossorigin');
     hv.src=it.k==='f'?URL.createObjectURL(it.file):it.url;hv.play().catch(()=>{})}
   rList();send(true)}
@@ -1196,7 +1197,7 @@ hv.onended=()=>go(cur+1);
 hv.onerror=()=>{const it=files[cur];if(!it||it.k!=='u'||!hv.getAttribute('src'))return;
   if(!it.nocors){it.nocors=true;hv.removeAttribute('crossorigin');hv.src=it.url;hv.play().catch(()=>{});toast('That site blocks casting its video, so it plays on this device only.')}
   else toast('Couldn\'t play this link. Use a YouTube link or a direct video file link.')};
-$('#clrbtn').onclick=()=>{if(yIs())ytTx({yx:'stop'});files=[];cur=-1;ytS=null;hv.pause();hv.removeAttribute('src');hv.load();hv.hidden=false;$('#ytcard').hidden=true;rList();send(true)};
+$('#clrbtn').onclick=()=>{if(yIs())ytTx({yx:'stop'});if(spOk)sp.pauseVideo();files=[];cur=-1;ytS=null;hv.pause();hv.removeAttribute('src');hv.load();hv.hidden=false;$('#ytcard').hidden=true;rList();send(true)};
 function send(full,only){const y=yIs(),m=JSON.stringify({n:full?files.map(f=>f.name):undefined,i:cur,t:y?(ytS?ytS.t:0):(hv.currentTime||0),d:y?(ytS?ytS.d:0):(hv.duration||0),p:y?(ytS?ytS.p:true):hv.paused});
   (only?[only]:peers).forEach(p=>p.dc.readyState==='open'&&p.dc.send(m))}
 
@@ -1221,9 +1222,19 @@ async function addUrl(){let u=$('#urlin').value.trim();if(!u)return;if(!/^[a-z]+
   else{let n=x.hostname;try{n=decodeURIComponent(x.pathname.split('/').filter(Boolean).pop()||x.hostname)}catch{}it={k:'u',url:x.href,name:'🌐 '+n}}
   files.push(it);$('#urlin').value='';rList();if(cur<0)go(files.length-1);else send(true)}
 $('#urlbtn').onclick=addUrl;$('#urlin').onkeydown=e=>{if(e.key==='Enter')addUrl()};
+// muted preview of the same YouTube video on the sender, kept in step with the receiver
+let sp=null,spOk=false,spId=null;
+async function spLoad(it){try{await ytAPI()}catch{return}
+  if(files[cur]!==it)return;spId=it.id;
+  if(spOk){sp.mute();sp.loadVideoById({videoId:it.id,startSeconds:it.s||0})}
+  else if(!sp)sp=new YT.Player('spp',{width:'100%',height:'100%',playerVars:{playsinline:1,rel:0,controls:0,disablekb:1,mute:1,autoplay:1},events:{
+    onReady:()=>{spOk=true;sp.mute();const c=files[cur];if(c&&c.k==='y')sp.loadVideoById({videoId:c.id,startSeconds:ytS?ytS.t:(c.s||0)})}}})}
+function spSync(m){if(!spOk||spId!==files[cur].id)return;const st=sp.getPlayerState();
+  if(Math.abs((sp.getCurrentTime()||0)-m.t)>2)sp.seekTo(m.t,true);
+  if(m.p&&st===1)sp.pauseVideo();else if(!m.p&&st!==1&&st!==3)sp.playVideo()}
 const YE={101:'The video owner doesn\'t allow it to play outside YouTube.',150:'The video owner doesn\'t allow it to play outside YouTube.',100:'This video isn\'t available.',2:'That video link isn\'t valid.',5:'The receiver couldn\'t play this video.',net:'The receiver can\'t reach YouTube. It needs internet.'};
 function ytIn(m){if(!yIs())return;
-  if(m.yx==='st'){if(m.v!==files[cur].id)return;ytS={t:m.t,d:m.d,p:m.p};$('#yts').textContent=(m.p?'Paused':'Playing')+' on the receiver · '+fmt(m.t)+' / '+fmt(m.d);send(false);
+  if(m.yx==='st'){if(m.v!==files[cur].id)return;ytS={t:m.t,d:m.d,p:m.p};spSync(m);$('#yts').textContent=(m.p?'Paused':'Playing')+' on the receiver · '+fmt(m.t)+' / '+fmt(m.d);send(false);
     if(m.e&&!ytEnd){ytEnd=true;go(cur+1)}}
   else if(m.yx==='err')$('#yts').textContent=YE[m.c]||YE[5]}
 $('#ytpp').onclick=()=>ytTx({yx:ytS&&ytS.p===false?'pause':'play'});
