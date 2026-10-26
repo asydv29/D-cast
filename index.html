@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0f0f0f">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/logo.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>D Cast Direct</title>
+<style>
+:root{--bg:#0f0f0f;--panel:#181818;--panel2:#242424;--text:#f1f1f1;--muted:#aaa;--accent:#ff174f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Arial,sans-serif;padding:14px;max-width:760px;margin:auto}
+h1{font-weight:300;font-size:24px;margin:4px 0 14px}h1 b{color:var(--accent)}
+h2{font-size:15px;margin:18px 0 6px}
+p,.hint{color:var(--muted);font-size:13.5px;line-height:1.5;margin:6px 0}
+button{border:0;cursor:pointer;background:var(--panel2);color:inherit;border-radius:20px;padding:10px 16px;font:inherit}
+button.main{background:var(--accent);color:#fff}
+.big{display:block;width:100%;padding:18px;border-radius:14px;margin:10px 0;font-size:17px;text-align:left}
+.big small{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+textarea{width:100%;height:80px;background:#121212;color:var(--text);border:1px solid #303030;border-radius:12px;padding:10px;font:12px monospace;word-break:break-all}
+video{width:100%;background:#000;border-radius:12px;max-height:60vh}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.pl div{padding:10px 12px;border-radius:10px;background:var(--panel);margin:6px 0;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl div.on{outline:2px solid var(--accent)}
+#st{padding:8px 12px;border-radius:10px;background:var(--panel);font-size:14px}
+input[type=range]{flex:1;min-width:120px;accent-color:var(--accent)}
+[hidden]{display:none!important}
+</style></head><body>
+<h1>D <b>Cast</b> Direct</h1>
+
+<section id="home">
+  <p>Cast videos from one device straight to another. Works with <b>no internet</b>: both devices just need to be on the same Wi-Fi (a router with no internet is fine) or one phone's hotspot.</p>
+  <button class="big" id="bh">📤 Share my videos<small>This device plays the videos</small></button>
+  <button class="big" id="bv">📺 Watch from another device<small>This device is the screen</small></button>
+</section>
+
+<section id="host" hidden>
+  <div id="unsup" class="hint" hidden>This browser can't cast video. Please use Chrome.</div>
+  <h2>1. Choose videos</h2>
+  <div class="row"><button class="main" id="pickbtn">Choose videos…</button>
+  <input id="pick" type="file" accept="video/*" multiple hidden></div>
+  <video id="hv" controls playsinline></video>
+  <div class="pl" id="hlist"></div>
+  <h2>2. Add a device: make a code and send it to that device</h2>
+  <div class="row"><button class="main" id="mk">➕ Add a device</button></div>
+  <textarea id="offer" readonly placeholder="Your code appears here"></textarea>
+  <div class="row"><button data-copy="offer">Copy</button><button data-share="offer">Share</button></div>
+  <h2>3. Paste the reply code from that device</h2>
+  <textarea id="ansIn" placeholder="Paste reply code"></textarea>
+  <div class="row"><button class="main" id="conn">Connect</button></div>
+  <div id="st">Not connected</div>
+  <p class="hint">Repeat steps 2–3 for every extra device; they all watch the same video at the same time. Keep this screen on. A phone can comfortably feed about 3 devices; a PC can feed more.</p>
+</section>
+
+<section id="view" hidden>
+  <div id="vsetup">
+    <h2>1. Paste the code from the sharing device</h2>
+    <textarea id="offIn" placeholder="Paste code"></textarea>
+    <div class="row"><button class="main" id="mkAns">Make reply code</button></div>
+    <h2>2. Send this reply code back</h2>
+    <textarea id="ans" readonly placeholder="Your reply code appears here"></textarea>
+    <div class="row"><button data-copy="ans">Copy</button><button data-share="ans">Share</button></div>
+    <div id="vst" class="hint"></div>
+  </div>
+  <div id="vplay" hidden>
+    <video id="rv" autoplay playsinline></video>
+    <div class="row"><button id="pp">⏯</button><input id="seek" type="range" min="0" max="1" step="0.1" value="0"><span id="tm" class="hint">0:00</span></div>
+    <div class="row"><button id="pv">⏮ Prev</button><button id="nx">Next ⏭</button><button id="fs">⛶ Full screen</button></div>
+    <div class="pl" id="vlist"></div>
+  </div>
+</section>
+
+<script>
+const $=s=>document.querySelector(s), show=id=>{['home','host','view'].forEach(x=>$('#'+x).hidden=x!==id)};
+const CFG={iceServers:[]}; // no STUN/TURN: local network only, no internet needed
+const fmt=s=>{s=Math.max(0,Math.round(s||0));return(s/60|0)+':'+String(s%60).padStart(2,'0')};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// ---- offline "codes": compressed SDP as text ----
+async function enc(d){const s=JSON.stringify({type:d.type,sdp:d.sdp});
+  if(window.CompressionStream){const u=new Uint8Array(await new Response(new Blob([s]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer());
+    let b='';u.forEach(c=>b+=String.fromCharCode(c));return 'Z'+btoa(b)}
+  return 'R'+btoa(unescape(encodeURIComponent(s)))}
+async function dec(t){t=t.replace(/\s/g,'');const k=t[0],raw=atob(t.slice(1));
+  if(k==='Z'){const u=Uint8Array.from(raw,c=>c.charCodeAt(0));return JSON.parse(await new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text())}
+  return JSON.parse(decodeURIComponent(escape(raw)))}
+const gathered=pc=>new Promise(r=>{if(pc.iceGatheringState==='complete')return r();
+  pc.addEventListener('icegatheringstatechange',()=>pc.iceGatheringState==='complete'&&r());setTimeout(r,4000)});
+document.addEventListener('click',async e=>{
+  const c=e.target.dataset.copy,s=e.target.dataset.share;if(!c&&!s)return;const t=$('#'+(c||s));if(!t.value)return;
+  if(s&&navigator.share){try{await navigator.share({text:t.value});return}catch{}}
+  try{await navigator.clipboard.writeText(t.value)}catch{t.select();document.execCommand('copy')}
+  e.target.textContent='Copied ✓';setTimeout(()=>e.target.textContent=c?'Copy':'Share',1500)});
+if(!navigator.share)document.querySelectorAll('[data-share]').forEach(b=>b.hidden=true);
+
+$('#bh').onclick=()=>{show('host');startHost()};
+$('#bv').onclick=()=>show('view');
+
+// ================= HOST (plays + casts to many devices) =================
+const hv=$('#hv');let files=[],cur=-1,cap,peers=[],pend=null;
+function startHost(){
+  if(cap)return;cap=(hv.captureStream||hv.mozCaptureStream||(()=>null)).call(hv);
+  if(!cap||!window.RTCPeerConnection){$('#unsup').hidden=false;return}
+  cap.onaddtrack=attach;hv.onloadedmetadata=hv.onplaying=attach;
+  try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{})}catch{}
+}
+function attach(){if(!cap)return;peers.forEach(p=>cap.getTracks().forEach(t=>{const s=p.snd[t.kind];if(s&&s.track!==t){if(t.kind==='video')t.contentHint='motion';s.replaceTrack(t)}}))}
+$('#pickbtn').onclick=()=>$('#pick').click();
+$('#pick').onchange=e=>{files=[...e.target.files];rList();if(files.length)go(0);send(true)};
+function rList(){$('#hlist').innerHTML=files.map((f,i)=>`<div class="${i===cur?'on':''}" data-i="${i}">${esc(f.name)}</div>`).join('')}
+$('#hlist').onclick=e=>{const i=e.target.dataset.i;if(i!=null)go(+i)};
+function go(i){if(i<0||i>=files.length)return;cur=i;if(hv.src)URL.revokeObjectURL(hv.src);hv.src=URL.createObjectURL(files[i]);hv.play().catch(()=>{});rList();send(true)}
+hv.onended=()=>go(cur+1);
+function send(full,only){const m=JSON.stringify({n:full?files.map(f=>f.name):undefined,i:cur,t:hv.currentTime||0,d:hv.duration||0,p:hv.paused});
+  (only?[only]:peers).forEach(p=>p.dc.readyState==='open'&&p.dc.send(m))}
+setInterval(()=>send(false),500);hv.onpause=hv.onplay=()=>send(false);
+function status(){const n=peers.filter(p=>p.pc.connectionState==='connected').length;
+  $('#st').textContent=n?`✅ ${n} device${n>1?'s':''} watching. Tap "Add a device" to connect another.`:(pend?'Waiting for reply code…':'No devices connected yet')}
+function newPeer(){
+  const pc=new RTCPeerConnection(CFG),p={pc,snd:{video:pc.addTransceiver('video',{direction:'sendonly'}).sender,audio:pc.addTransceiver('audio',{direction:'sendonly'}).sender}};
+  p.dc=pc.createDataChannel('ctl');p.dc.onopen=()=>send(true,p);
+  p.dc.onmessage=e=>{const m=JSON.parse(e.data);
+    if(m.c==='play')hv.play();else if(m.c==='pause')hv.pause();else if(m.c==='seek')hv.currentTime=m.t;else if(m.c==='go')go(m.i)};
+  pc.onconnectionstatechange=async()=>{const s=pc.connectionState;
+    if(s==='connected'){try{const q=p.snd.video.getParameters();if(!q.encodings||!q.encodings.length)q.encodings=[{}];q.encodings[0].maxBitrate=5e6;await p.snd.video.setParameters(q)}catch{}
+      if(pend===p){pend=null;$('#offer').value='';$('#ansIn').value=''}}
+    if(s==='failed'||s==='closed'){peers=peers.filter(x=>x!==p);if(pend===p){pend=null;$('#st').textContent='❌ Connection failed. Tap "Add a device" and try again (see tips).';return}}
+    status()};
+  peers.push(p);attach();return p}
+$('#mk').onclick=async()=>{
+  if(!cap)return;if(pend){pend.pc.close();peers=peers.filter(x=>x!==pend)}
+  const p=pend=newPeer();$('#ansIn').value='';
+  await p.pc.setLocalDescription(await p.pc.createOffer());await gathered(p.pc);
+  $('#offer').value=await enc(p.pc.localDescription);status()};
+$('#conn').onclick=async()=>{if(!pend)return;try{await pend.pc.setRemoteDescription(await dec($('#ansIn').value));$('#st').textContent='Connecting…'}catch{$('#st').textContent='That reply code is not valid. Tap "Add a device" for a new code.'}};
+
+// ================= VIEWER (screen + remote) =================
+const rv=$('#rv'),rs=new MediaStream();rv.srcObject=rs;let vpc,vdc,drag=false;
+$('#mkAns').onclick=async()=>{
+  try{const off=await dec($('#offIn').value);
+    vpc=new RTCPeerConnection(CFG);
+    vpc.ontrack=e=>{if(!rs.getTracks().includes(e.track))rs.addTrack(e.track);rv.play().catch(()=>{})};
+    vpc.ondatachannel=e=>{vdc=e.channel;vdc.onmessage=onState};
+    vpc.onconnectionstatechange=()=>{const s=vpc.connectionState;
+      if(s==='connected'){$('#vsetup').hidden=true;$('#vplay').hidden=false;rv.play().catch(()=>{})}
+      else if(s==='failed'||s==='disconnected'){$('#vsetup').hidden=false;$('#vplay').hidden=true;$('#vst').textContent='Connection lost. Start again from the sharing device.'}
+      else $('#vst').textContent='Connecting…'};
+    await vpc.setRemoteDescription(off);await vpc.setLocalDescription(await vpc.createAnswer());await gathered(vpc);
+    $('#ans').value=await enc(vpc.localDescription);$('#vst').textContent='Now send this reply code to the sharing device and tap Connect there.';
+  }catch{$('#vst').textContent='That code is not valid. Copy the whole code again.'}};
+const cmd=o=>vdc&&vdc.readyState==='open'&&vdc.send(JSON.stringify(o));let paused=false;
+function onState(e){const m=JSON.parse(e.data);paused=m.p;
+  if(m.n){$('#vlist').innerHTML=m.n.map((n,i)=>`<div data-i="${i}">${esc(n)}</div>`).join('')}
+  document.querySelectorAll('#vlist div').forEach((d,i)=>d.classList.toggle('on',i===m.i));
+  if(!drag){$('#seek').max=m.d||1;$('#seek').value=m.t}$('#tm').textContent=fmt(m.t)+' / '+fmt(m.d);
+  $('#pp').textContent=m.p?'▶ Play':'⏸ Pause'}
+$('#pp').onclick=()=>{rv.play().catch(()=>{});cmd({c:paused?'play':'pause'})};
+$('#seek').onpointerdown=()=>drag=true;
+$('#seek').onchange=e=>{drag=false;cmd({c:'seek',t:+e.target.value})};
+$('#vlist').onclick=e=>{const i=e.target.dataset.i;if(i!=null)cmd({c:'go',i:+i})};
+let idx=()=>[...document.querySelectorAll('#vlist div')].findIndex(d=>d.classList.contains('on'));
+$('#pv').onclick=()=>cmd({c:'go',i:idx()-1});$('#nx').onclick=()=>cmd({c:'go',i:idx()+1});
+$('#fs').onclick=()=>(rv.requestFullscreen||rv.webkitRequestFullscreen||(()=>{})).call(rv);
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
+</script></body></html>
