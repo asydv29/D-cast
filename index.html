@@ -74,6 +74,9 @@ input[type=url]{flex:1;min-width:160px;background:#0b1224;color:var(--text);bord
 #ytbox{aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden}#ytbox iframe{width:100%;height:100%;display:block;border:0}
 #ytcard b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #spbox{aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;margin-bottom:8px;pointer-events:none}#spbox iframe{width:100%;height:100%;display:block;border:0}
+#ytcard.fsx{position:fixed;inset:0;z-index:9999;margin:0;border-radius:0;background:#000;display:flex;flex-direction:column;justify-content:center;padding:env(safe-area-inset-top) 8px env(safe-area-inset-bottom)}
+#ytcard.fsx #spbox{border-radius:0;width:100%}#ytcard:fullscreen{background:#000;display:flex;flex-direction:column;justify-content:center;padding:8px}
+#ytcard.fsx .hint,#ytcard:fullscreen .hint{text-align:center}
 [hidden]{display:none!important}
 </style></head><body>
 
@@ -135,7 +138,7 @@ input[type=url]{flex:1;min-width:160px;background:#0b1224;color:var(--text);bord
   <div class="row"><input id="urlin" type="url" inputmode="url" placeholder="Paste a YouTube or video link…" autocomplete="off"><button class="main" id="urlbtn">🌐 Add link</button></div>
   <p class="hint">Mix device videos and web links in one list. <b>YouTube</b> links play on the receiving device (it needs internet). Other links must point straight to a video file (.mp4, .webm) from a site that allows sharing.</p>
   <video id="hv" controls playsinline></video>
-  <div id="ytcard" class="card" hidden><div id="spbox"><div id="spp"></div></div><b id="ytt"></b><p class="hint" id="yts"></p><div class="row"><button id="ytpp">⏯ Play / Pause</button></div></div>
+  <div id="ytcard" class="card" hidden><div id="spbox"><div id="spp"></div></div><b id="ytt"></b><p class="hint" id="yts"></p><div class="row"><button id="ytpp">⏯ Play / Pause</button><button id="ytsnd">🔇 Sound off</button><button id="ytfs">⛶ Full screen</button></div></div>
   <div class="pl" id="hlist"></div>
   </div>
 
@@ -1223,12 +1226,24 @@ async function addUrl(){let u=$('#urlin').value.trim();if(!u)return;if(!/^[a-z]+
   files.push(it);$('#urlin').value='';rList();if(cur<0)go(files.length-1);else send(true)}
 $('#urlbtn').onclick=addUrl;$('#urlin').onkeydown=e=>{if(e.key==='Enter')addUrl()};
 // muted preview of the same YouTube video on the sender, kept in step with the receiver
-let sp=null,spOk=false,spId=null;
+let sp=null,spOk=false,spId=null,spOn=false;
+// sound on the sender is opt-in (browsers need a tap); the receiver keeps playing its own audio too
+function spSnd(on){spOn=on;if(spOk){if(on){sp.unMute();sp.setVolume(100)}else sp.mute()}$('#ytsnd').textContent=on?'🔊 Sound on':'🔇 Sound off'}
+$('#ytsnd').onclick=()=>{spSnd(!spOn);if(spOn&&spOk&&sp.getPlayerState()!==1&&!(ytS&&ytS.p))sp.playVideo()};
+// full screen: real Fullscreen API where it exists, otherwise a fixed full-window layer (iPhone Safari)
+function ytFsOn(){const c=$('#ytcard');return c.classList.contains('fsx')||document.fullscreenElement===c||document.webkitFullscreenElement===c}
+function ytFsSet(){$('#ytfs').textContent=ytFsOn()?'✕ Exit full screen':'⛶ Full screen'}
+$('#ytfs').onclick=()=>{const c=$('#ytcard');
+  if(ytFsOn()){if(document.fullscreenElement||document.webkitFullscreenElement)(document.exitFullscreen||document.webkitExitFullscreen).call(document);c.classList.remove('fsx');ytFsSet();return}
+  const rf=c.requestFullscreen||c.webkitRequestFullscreen;
+  if(rf){try{const r=rf.call(c);if(r&&r.catch)r.catch(()=>{c.classList.add('fsx');ytFsSet()})}catch{c.classList.add('fsx')}}else c.classList.add('fsx');
+  ytFsSet()};
+document.addEventListener('fullscreenchange',ytFsSet);document.addEventListener('webkitfullscreenchange',ytFsSet);
 async function spLoad(it){try{await ytAPI()}catch{return}
   if(files[cur]!==it)return;spId=it.id;
-  if(spOk){sp.mute();sp.loadVideoById({videoId:it.id,startSeconds:it.s||0})}
+  if(spOk){spSnd(spOn);sp.loadVideoById({videoId:it.id,startSeconds:it.s||0})}
   else if(!sp)sp=new YT.Player('spp',{width:'100%',height:'100%',playerVars:{playsinline:1,rel:0,controls:0,disablekb:1,mute:1,autoplay:1},events:{
-    onReady:()=>{spOk=true;sp.mute();const c=files[cur];if(c&&c.k==='y')sp.loadVideoById({videoId:c.id,startSeconds:ytS?ytS.t:(c.s||0)})}}})}
+    onReady:()=>{spOk=true;spSnd(spOn);const c=files[cur];if(c&&c.k==='y')sp.loadVideoById({videoId:c.id,startSeconds:ytS?ytS.t:(c.s||0)})}}})}
 function spSync(m){if(!spOk||spId!==files[cur].id)return;const st=sp.getPlayerState();
   if(Math.abs((sp.getCurrentTime()||0)-m.t)>2)sp.seekTo(m.t,true);
   if(m.p&&st===1)sp.pauseVideo();else if(!m.p&&st!==1&&st!==3)sp.playVideo()}
