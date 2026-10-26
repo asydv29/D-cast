@@ -2,139 +2,126 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0f0f0f">
+<meta name="theme-color" content="#070d1a">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/logo.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<title>D Cast — Local Casting</title>
+<title>D Cast</title>
 <style>
-:root{--bg:#070e19;--panel:#111b2a;--panel2:#1b2739;--text:#f4f7ff;--muted:#aab6ce;--accent:#168cff;--accent2:#05c8f2;--line:#243147;--green:#25d366}
+:root{--bg:#070d1a;--panel:#0f1a30;--panel2:#18253f;--line:#1a2744;--text:#f1f5ff;--muted:#9db0cf;--accent:#1677ff}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 76% 15%,#132a56 0,transparent 34%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;padding:0;max-width:none}
-button{border:1px solid #314057;cursor:pointer;background:var(--panel2);color:inherit;border-radius:12px;padding:11px 16px;font:inherit;transition:transform .15s,border-color .15s}
-button:hover{border-color:#168cff;transform:translateY(-1px)}
-button.main{background:linear-gradient(135deg,#0878f9,#168cff);border-color:#168cff;color:#fff;box-shadow:0 8px 24px #007bff28}
-h1,h2,h3,p{margin-top:0}
-h1{font-size:clamp(27px,3vw,48px);font-weight:800;letter-spacing:-1.5px;margin:0}
-h1 b{color:var(--accent2)}
-h2{font-size:18px;margin:20px 0 10px}
-p,.hint{color:var(--muted);font-size:14px;line-height:1.55;margin:7px 0}
-#appbar{height:76px;display:flex;align-items:center;gap:13px;padding:0 26px;border-bottom:1px solid var(--line);background:#0c1422eF;position:sticky;top:0;z-index:10}
-.brandmark{width:42px;height:42px;border-radius:11px;background:linear-gradient(145deg,#06d8ff,#0878ff);display:grid;place-items:center;font-size:27px;font-weight:900;color:#07152a;font-style:italic}
-#appbar .brand{font-size:25px;font-weight:800;letter-spacing:-.5px}
-.topactions{margin-left:auto;display:flex;gap:8px}
-.topactions button{border:0;background:transparent;font-size:20px;padding:9px}
-#layout{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:calc(100vh - 76px)}
-#sidebar{padding:24px 14px;border-right:1px solid var(--line);background:#09111e}
-.navbtn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:transparent;border:0;padding:14px 16px;margin:0 0 7px;border-radius:12px;color:#b9c6df}
-.navbtn.active{background:linear-gradient(90deg,#087bff,#168cff);color:white;box-shadow:0 8px 22px #087bff2b}
-#main{padding:30px clamp(18px,3.3vw,50px) 40px;min-width:0;max-width:1600px;width:100%;margin:auto}
-#home .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.95fr);align-items:center;gap:24px;min-height:320px;padding:12px 0 24px}
-.heroTitle{font-size:clamp(40px,5.3vw,76px);line-height:1.02;letter-spacing:-2px;font-weight:850;margin:0 0 6px}
-.heroTitle .d{color:#05c7f2}
-.heroSub{font-size:clamp(18px,2vw,28px);font-weight:650;color:#b5c6e8;margin-bottom:14px}
-.heroText{max-width:610px;font-size:15px}
-.heroArt{width:100%;max-height:285px;object-fit:contain;filter:drop-shadow(0 14px 30px #126dff2a)}
-.heroButtons{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
-.heroButtons button{padding:14px 20px;font-weight:700}
-.sectionHead{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.textlink{background:none;border:0;color:#36a5ff;padding:6px}
-.deviceGrid,.contentGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.deviceCard,.contentCard,.infoCard{background:linear-gradient(145deg,#131d2b,#0f1724);border:1px solid #243147;border-radius:15px;padding:17px;min-width:0}
-.deviceCard{display:flex;gap:13px;align-items:center}
-.deviceIcon{width:62px;height:56px;border-radius:10px;background:linear-gradient(145deg,#123a75,#0d8eff);display:grid;place-items:center;font-size:29px;flex-shrink:0}
-.deviceName{font-weight:750;font-size:15px;overflow-wrap:anywhere}
-.deviceType{font-size:13px;color:var(--muted);margin-top:3px}
-.online{color:var(--green);font-size:13px;margin-top:5px}.offline{color:#9aa6bc;font-size:13px;margin-top:5px}
-.contentGrid{grid-template-columns:repeat(4,minmax(0,1fr))}
-.contentCard{display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;min-height:105px}
-.contentIcon{width:58px;height:58px;display:grid;place-items:center;border-radius:14px;font-size:26px;flex-shrink:0}
-.contentCard strong{display:block;font-size:15px}.contentCard small{display:block;color:var(--muted);margin-top:4px;font-size:12px}
-.contentCard .chev{margin-left:auto;font-size:24px;color:#c4d0e5}
-.purple .contentIcon{background:#7b2c94}.blue .contentIcon{background:#075ed2}.green .contentIcon{background:#087e58}.orange .contentIcon{background:#a34a1b}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+#host,#view{max-width:760px;margin:0 auto;padding:14px}
+.back{background:none;color:var(--muted);padding:6px 0}
+h2{font-size:15px;margin:18px 0 6px}
+p,.hint{color:var(--muted);font-size:13.5px;line-height:1.5;margin:6px 0}
+button{border:0;cursor:pointer;background:var(--panel2);color:inherit;border-radius:20px;padding:10px 16px;font:inherit}
+button.main{background:var(--accent);color:#fff}
 .big{display:block;width:100%;padding:18px;border-radius:14px;margin:10px 0;font-size:17px;text-align:left}
 .big small{display:block;color:var(--muted);font-size:13px;margin-top:4px}
-textarea{width:100%;height:70px;background:#0b1220;color:var(--text);border:1px solid #303f57;border-radius:12px;padding:10px;font:12px monospace;word-break:break-all}
+textarea{width:100%;height:70px;background:#0b1224;color:var(--text);border:1px solid #26365a;border-radius:12px;padding:10px;font:12px monospace;word-break:break-all}
 video{width:100%;background:#000;border-radius:12px;max-height:60vh}
 .role.on{outline:2px solid var(--accent)}.role small{opacity:.7}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
 .pl div{padding:10px 12px;border-radius:10px;background:var(--panel);margin:6px 0;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pl div.on{outline:2px solid var(--accent)}
-#st{padding:10px 13px;border-radius:10px;background:var(--panel);border:1px solid var(--line);font-size:14px}
+#st{padding:8px 12px;border-radius:10px;background:var(--panel);font-size:14px}
 input[type=range]{flex:1;min-width:120px;accent-color:var(--accent)}
 .qr{display:block;width:100%;max-width:440px;margin:10px auto;background:#fff;border-radius:12px;image-rendering:pixelated}
+.card{background:var(--panel);border-radius:14px;padding:12px;margin:10px 0}
 details{margin:12px 0}summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 #scanner{position:fixed;inset:0;background:#000;z-index:30;display:flex;flex-direction:column}
 #scanner video{flex:1;min-height:0;border-radius:0;max-height:none;object-fit:cover}
 #scanner .bar{padding:14px;background:var(--bg);display:flex;gap:10px;align-items:center;justify-content:space-between}
+
+svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-size:28px;font-weight:700}.brand svg{width:38px;height:38px}
+.tools{display:flex;gap:8px}.ib{background:none;padding:8px;border-radius:50%;color:var(--muted);display:grid;place-items:center}.ib.ava{background:#2a3550;color:#fff}
+.app{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:calc(100vh - 69px)}
+.side{border-right:1px solid var(--line);padding:24px 16px;display:flex;flex-direction:column;gap:8px}
+.nv{display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:12px;background:none;color:#cdd8ee;font-size:17px;text-align:left}.nv.on{background:var(--accent);color:#fff}
+.pg{padding:28px 30px 40px;min-width:0;background:radial-gradient(700px 380px at 75% 0,#1b2d6a55,transparent)}
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px;align-items:center}
+.wm{display:flex;align-items:center;gap:8px;font-size:clamp(48px,8vw,84px);font-weight:800;line-height:1;letter-spacing:-1px}.wm svg{width:.8em;height:.8em}
+.hero h2{font-size:clamp(20px,3vw,32px);font-weight:500;color:var(--muted);margin:10px 0 18px}
+.hero p{font-size:17px;max-width:520px;color:#c3cfe6}
+.cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:22px}
+.cta button{display:flex;align-items:center;gap:12px;padding:18px 28px;border-radius:12px;font-size:18px;font-weight:600}.cta .main{background:var(--accent)}.cta .sec{background:#141f36;border:1px solid var(--line)}
+.art{width:100%;height:auto;max-height:320px}
+.sh{display:flex;justify-content:space-between;align-items:center;margin:34px 0 14px}.sh h3{margin:0;font-size:22px}.sh button{background:none;color:#2f93ff;padding:4px 0;display:flex;align-items:center;gap:4px}
+.dg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.dv{display:flex;align-items:center;gap:18px;padding:20px;border-radius:14px;background:var(--panel);border:1px solid var(--line);text-align:left;width:100%;border-radius:14px}
+.th{width:84px;height:68px;border-radius:8px;background:linear-gradient(135deg,#1a5cff,#6ad0ff);display:grid;place-items:center;flex:none}.th svg{width:34px;height:34px}
+.dv b{display:block;font-size:18px}.dv span{display:block;color:var(--muted);margin:4px 0 8px}.dv em{font-style:normal;display:flex;align-items:center;gap:8px;color:#d6e2f8}.dv em i{width:12px;height:12px;border-radius:50%;background:#22d05a}
+.empty{grid-column:1/-1;border:1px dashed #2a3c66;border-radius:14px;padding:22px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.cg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.cc{--c:#7b3ea8;display:flex;align-items:center;gap:16px;padding:18px;border-radius:14px;text-align:left;width:100%;background:color-mix(in srgb,var(--c) 16%,#0b1224);border:1px solid color-mix(in srgb,var(--c) 38%,transparent)}
+.cc>div{flex:1;min-width:0}.cc b{display:block;font-size:18px}.cc span{color:var(--muted);font-size:14px}
+.ct{width:68px;height:68px;border-radius:16px;background:var(--c);display:grid;place-items:center;flex:none;color:#fff}.ct svg{width:34px;height:34px}.cc>svg{color:#cdd8ee;width:20px;height:20px}
+#sheet{position:fixed;inset:0;background:#000b;z-index:25;display:flex;align-items:center;justify-content:center;padding:12px}
+.sbox{background:var(--panel);width:min(480px,100%);padding:20px;border-radius:20px;border:1px solid var(--line)}.sbox h2{margin:0 0 4px;font-size:20px}
+#toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#1d2b4a;padding:10px 16px;border-radius:12px;z-index:40;font-size:14px;white-space:nowrap}
+@media(max-width:900px){
+.top{padding:12px 14px}.brand{font-size:24px}.brand svg{width:32px;height:32px}
+.app{grid-template-columns:1fr}
+.side{position:fixed;bottom:0;left:0;right:0;z-index:20;flex-direction:row;border:0;border-top:1px solid var(--line);background:#0a1224;padding:6px;gap:2px}
+.nv{flex:1;flex-direction:column;gap:4px;padding:8px 4px;font-size:11px;align-items:center;border-radius:10px}.nv svg{width:22px;height:22px}
+.pg{padding:18px 16px 100px}.hero{grid-template-columns:1fr}.hero p{font-size:15px}
+.cta button{flex:1;justify-content:center;padding:16px 14px;font-size:16px;white-space:nowrap}
+.dg{grid-template-columns:1fr}.cg{grid-template-columns:1fr 1fr}.cc{padding:12px;gap:10px}.ct{width:48px;height:48px;border-radius:12px}.ct svg{width:26px;height:26px}.cc>svg{display:none}.cc b{font-size:16px}}
 [hidden]{display:none!important}
-@media(max-width:900px){#layout{grid-template-columns:1fr}#sidebar{display:flex;gap:5px;overflow:auto;padding:8px;border-right:0;border-bottom:1px solid var(--line);position:sticky;top:76px;z-index:9}.navbtn{justify-content:center;white-space:nowrap;width:auto;margin:0;padding:10px 13px}.navbtn span.label{display:none}#main{padding:20px 16px}.deviceGrid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.contentGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){#appbar{height:64px;padding:0 15px}#layout{min-height:calc(100vh - 64px)}#sidebar{top:64px}.brandmark{width:36px;height:36px}.hero{grid-template-columns:1fr!important;gap:8px!important}.heroArt{max-height:190px;grid-row:1}.heroButtons button{flex:1}.contentGrid{gap:8px}.contentCard{padding:12px;gap:9px;min-height:90px}.contentIcon{width:45px;height:45px;font-size:22px}.contentCard strong{font-size:13px}.contentCard small{font-size:11px}.deviceCard{padding:12px}.topactions{gap:0}}
 </style></head><body>
-<header id="appbar">
-  <div class="brandmark">D</div><div class="brand">D Cast</div>
-  <div class="topactions"><button title="Help" onclick="document.getElementById('helpbox').hidden=!document.getElementById('helpbox').hidden">ⓘ</button><button title="Settings" onclick="document.getElementById('settingsbox').hidden=!document.getElementById('settingsbox').hidden">⚙</button><button title="Profile">●</button></div>
-</header>
-<div id="layout">
-<nav id="sidebar" aria-label="Main navigation">
-  <button class="navbtn active" data-nav="home">⌂ <span class="label">Home</span></button>
-  <button class="navbtn" data-nav="devices">▣ <span class="label">Devices</span></button>
-  <button class="navbtn" data-nav="cast">◉ <span class="label">Cast</span></button>
-  <button class="navbtn" data-nav="history">◷ <span class="label">History</span></button>
-  <button class="navbtn" data-nav="settings">⚙ <span class="label">Settings</span></button>
-</nav>
-<main id="main">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22c1ff"/><stop offset="1" stop-color="#1668ff"/></linearGradient></defs>
+<symbol id="i-logo" viewBox="0 0 24 24"><path fill="url(#lg)" fill-rule="evenodd" d="M1 2h10a10 10 0 0 1 0 20H1zM8 7v10l8-5z"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></symbol>
+<symbol id="i-devices" viewBox="0 0 24 24"><path d="M4 6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7H4zM2 17h12M16 11h4a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1z"/></symbol>
+<symbol id="i-cast" viewBox="0 0 24 24"><path d="M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6M2 12a9 9 0 0 1 8 8M2 16a5 5 0 0 1 4 4M2 20h.01"/></symbol>
+<symbol id="i-history" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12.2 2h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7V4a2 2 0 0 0-2-2z"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="8" r="4" fill="currentColor"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></symbol>
+<symbol id="i-next" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4v16l13-8z" fill="currentColor"/></symbol>
+<symbol id="i-photo" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.5"/><path d="M21 16l-5-5L5 21"/></symbol>
+<symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3" fill="currentColor"/><circle cx="18" cy="16" r="3" fill="currentColor"/></symbol>
+<symbol id="i-screen" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></symbol></svg>
+<div id="toast" hidden></div>
+<div id="sheet" hidden><div class="sbox"><h2>Pair a new device</h2>
+  <p class="hint">This device is the…</p>
+  <div class="row"><button class="main role on" id="rh">📤 Sender<small> plays the videos</small></button><button class="main role" id="rv2">📺 Receiver<small> is the screen</small></button></div>
+  <p class="hint">Then scan one QR, once, on either device. Scanning a QR from the other device picks the right role automatically.</p>
+  <div class="row"><button class="main" id="hshow">📱 Show QR</button><button class="main" id="hscan0">📷 Scan QR</button><button id="sheetX">Close</button></div></div></div>
 <section id="home">
-  <div class="hero">
-    <div>
-      <div class="heroTitle"><span class="d">D</span> Cast</div>
-      <div class="heroSub">Cast to another device easily</div>
-      <p class="heroText">Stream videos from your device to a paired screen. Use the same Wi-Fi network or one device’s hotspot — mobile data and internet are not required. Media travels directly between devices using WebRTC, not through a cloud video server.</p>
-      <div class="heroButtons">
-        <button class="main" id="hshow">▣ Start Casting</button>
-        <button id="hscan0">⌁ Pair / Scan QR</button>
-      </div>
-      <p class="hint">Local-only mode: show a QR on either device, scan it on the other, then scan the reply QR to complete secure WebRTC setup.</p>
-    </div>
-    <div>
-      <svg class="heroArt" viewBox="0 0 520 300" role="img" aria-label="Phone streaming video directly to a tablet">
-        <defs><linearGradient id="screenGlow" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0c8dff"/><stop offset="1" stop-color="#6d40e8"/></linearGradient><linearGradient id="lake" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fa8e9c"/><stop offset="1" stop-color="#132c66"/></linearGradient></defs>
-        <ellipse cx="285" cy="266" rx="220" ry="17" fill="#007bff" opacity=".16"/>
-        <rect x="195" y="28" width="300" height="222" rx="17" fill="#020712" stroke="#5a6886" stroke-width="4"/>
-        <rect x="205" y="39" width="280" height="200" rx="9" fill="url(#lake)"/>
-        <circle cx="426" cy="69" r="20" fill="#ffcfb0" opacity=".8"/>
-        <path d="M205 157 L260 102 294 133 340 77 398 147 430 119 485 164 V239 H205Z" fill="#25365e"/>
-        <path d="M205 177 L268 137 315 162 367 120 420 163 485 143 V239 H205Z" fill="#102947"/>
-        <path d="M205 198 Q270 184 330 203 T485 194 V239 H205Z" fill="#183b69" opacity=".85"/>
-        <rect x="20" y="76" width="108" height="174" rx="18" fill="#050b17" stroke="#64738f" stroke-width="4"/>
-        <rect x="29" y="91" width="90" height="145" rx="10" fill="url(#screenGlow)"/>
-        <rect x="51" y="139" width="47" height="47" rx="13" fill="#fff" opacity=".18"/>
-        <path d="M68 149 L68 177 L90 163Z" fill="#fff"/>
-        <path d="M143 135 Q168 161 143 187 M160 121 Q196 161 160 201 M178 108 Q225 161 178 214" fill="none" stroke="#08bdf2" stroke-width="7" stroke-linecap="round"/>
-        <circle cx="73" cy="83" r="2" fill="#a9b7d1"/>
-      </svg>
-    </div>
-  </div>
-  <div id="helpbox" class="infoCard" hidden><b>How local casting works</b><p>Both devices must be on the same Wi-Fi or hotspot. No mobile data is needed. One device displays an offer QR; the other scans it and displays a reply QR, which the first device scans. WebRTC then sends the media directly device-to-device.</p></div>
-  <div id="settingsbox" class="infoCard" hidden><b>Connection settings</b><p>Connection mode: <b>Local network only</b>. Cloud signaling and STUN relay mode are not used by the local pairing buttons. Browser camera permission is needed to scan QR codes.</p></div>
-  <div class="sectionHead"><h2>Paired Devices</h2><button class="textlink" data-nav="devices">View all ›</button></div>
-  <div class="deviceGrid">
-    <div class="deviceCard"><div class="deviceIcon">▣</div><div><div class="deviceName" id="thisDeviceName">This Device</div><div class="deviceType">Current browser</div><div class="online">● Ready to pair</div></div></div>
-    <div class="deviceCard"><div class="deviceIcon" style="background:linear-gradient(145deg,#293b55,#536c91)">▰</div><div><div class="deviceName">Receiver</div><div class="deviceType">Android / tablet / PC</div><div class="offline">● Not connected</div></div></div>
-    <div class="deviceCard"><div class="deviceIcon" style="background:linear-gradient(145deg,#402b7d,#8b58dc)">▱</div><div><div class="deviceName">Add a device</div><div class="deviceType">Same Wi-Fi or hotspot</div><div class="online">＋ Pair by QR</div></div></div>
-  </div>
-  <div class="sectionHead"><h2>Cast Content</h2></div>
-  <div class="contentGrid">
-    <button class="contentCard purple" data-content="videos"><span class="contentIcon">▶</span><span><strong>Videos</strong><small>Cast your videos</small></span><span class="chev">›</span></button>
-    <button class="contentCard blue" data-content="photos"><span class="contentIcon">▧</span><span><strong>Photos</strong><small>Photo casting</small></span><span class="chev">›</span></button>
-    <button class="contentCard green" data-content="music"><span class="contentIcon">♫</span><span><strong>Music</strong><small>Audio casting</small></span><span class="chev">›</span></button>
-    <button class="contentCard orange" data-content="screen"><span class="contentIcon">▣</span><span><strong>Screen</strong><small>Share your screen</small></span><span class="chev">›</span></button>
-  </div>
-  <p class="hint" id="contentNotice">Video casting is available in this build. Photos, music, and screen sharing are shown as planned content modes; they require their own media-capture/playback implementation.</p>
-</section>
-<div id="navPlaceholder" hidden></div>
+<header class="top"><div class="brand"><svg class="i"><use href="#i-logo"/></svg> D Cast</div><div class="tools"><button class="ib" id="tHelp" aria-label="Help"><svg class="i"><use href="#i-help"/></svg></button><button class="ib" id="tSet" aria-label="Settings"><svg class="i"><use href="#i-settings"/></svg></button><button class="ib ava" id="tUser" aria-label="Profile"><svg class="i"><use href="#i-user"/></svg></button></div></header>
+<div class="app">
+<nav class="side"><button class="nv on" data-nav="home"><svg class="i"><use href="#i-home"/></svg> Home</button><button class="nv" data-nav="devices"><svg class="i"><use href="#i-devices"/></svg> Devices</button><button class="nv" data-nav="cast"><svg class="i"><use href="#i-cast"/></svg> Cast</button><button class="nv" data-nav="history"><svg class="i"><use href="#i-history"/></svg> History</button><button class="nv" data-nav="settings"><svg class="i"><use href="#i-settings"/></svg> Settings</button></nav>
+<main class="pg">
+<div class="hero"><div>
+<div class="wm"><svg class="i"><use href="#i-logo"/></svg> Cast</div><h2>Cast to another device easily</h2>
+<p>Stream videos, photos, and more from your device to your paired devices. Fast, private, and no internet required.</p>
+<div class="cta"><button class="main" id="startCast"><svg class="i"><use href="#i-cast"/></svg> Start Casting</button><button class="sec" id="pairNew"><svg class="i"><use href="#i-link"/></svg> Pair New Device</button></div></div>
+<svg class="art" viewBox="0 0 560 300" aria-hidden="true"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3c3a96"/><stop offset=".55" stop-color="#e0568f"/><stop offset="1" stop-color="#ffb07a"/></linearGradient><clipPath id="scr"><rect x="196" y="34" width="336" height="206" rx="8"/></clipPath></defs>
+<ellipse cx="380" cy="150" rx="230" ry="130" fill="#1a3fbf" opacity=".22"/>
+<g transform="rotate(-3 380 140)"><rect x="188" y="26" width="352" height="222" rx="14" fill="#0b1224" stroke="#2b3b60" stroke-width="3"/>
+<g clip-path="url(#scr)"><rect x="196" y="34" width="336" height="206" fill="url(#sky)"/><path d="M196 190l62-60 30 28 58-78 52 70 36-30 98 70v50H196z" fill="#2a2058"/><path d="M196 196l70-30 60 26 60-24 80 28 66-10v54H196z" fill="#10132e"/><rect x="196" y="200" width="336" height="40" fill="#241b50" opacity=".9"/><path d="M196 206l70 8 60-4 70 10 136-6v26H196z" fill="#10132e" opacity=".6"/></g></g>
+<path d="M156 118q16 30 0 62M174 102q26 48 0 94M192 86q36 66 0 126" fill="none" stroke="#1ea0ff" stroke-width="7" stroke-linecap="round"/>
+<g transform="rotate(-2 100 145)"><rect x="52" y="52" width="92" height="186" rx="16" fill="#0b1224" stroke="#2b3b60" stroke-width="3"/><rect x="59" y="60" width="78" height="170" rx="11" fill="#1c2c9a"/><rect x="78" y="124" width="40" height="40" rx="10" fill="#4a7dff"/><path d="M92 134v20l17-10z" fill="#fff"/></g></svg></div>
+<div class="sh"><h3>Paired Devices</h3><button id="viewAll">View All <svg class="i"><use href="#i-next"/></svg></button></div>
+<div class="dg" id="dl"></div>
+<div class="sh"><h3>Cast Content</h3></div>
+<div class="cg">
+<button class="cc" id="cVideos"><div class="ct"><svg class="i"><use href="#i-play"/></svg></div><div><b>Videos</b><span>Cast your videos</span></div><svg class="i"><use href="#i-next"/></svg></button>
+<button class="cc" style="--c:#1677ff" data-soon="Photos"><div class="ct"><svg class="i"><use href="#i-photo"/></svg></div><div><b>Photos</b><span>Cast your photos</span></div><svg class="i"><use href="#i-next"/></svg></button>
+<button class="cc" style="--c:#1fa34a" data-soon="Music"><div class="ct"><svg class="i"><use href="#i-music"/></svg></div><div><b>Music</b><span>Cast your music</span></div><svg class="i"><use href="#i-next"/></svg></button>
+<button class="cc" style="--c:#d2691e" data-soon="Screen"><div class="ct"><svg class="i"><use href="#i-screen"/></svg></div><div><b>Screen</b><span>Cast your screen</span></div><svg class="i"><use href="#i-next"/></svg></button>
+</div></main></div></section>
+
 <section id="host" hidden>
+  <button class="back" data-home>← Home</button>
   <div id="unsup" class="hint" hidden>This browser can't cast video. Please use Chrome.</div>
   <div id="hmain" hidden>
   <h2>Choose videos</h2>
@@ -148,10 +135,10 @@ details{margin:12px 0}summary{cursor:pointer;color:var(--muted);font-size:13.5px
   <p class="hint">Only <b>one</b> device scans, <b>once</b>. Either show a QR here, or scan the QR shown on the other device.</p>
   <div class="row"><button class="main" id="mk">📱 Show QR here</button><button class="main" id="hscan">📷 Scan other device's QR</button></div>
   <div id="pairOn" class="card" hidden>
-    <p>On the other device open D Cast → <i>Watch</i> → <i>Scan code</i> (or use its normal camera app) and scan this. That's all. This offer QR is for this pairing session. After scanning, scan the reply QR to finish local setup.</p>
+    <p>On the other device open D Cast → <i>Watch</i> → <i>Scan code</i> (or use its normal camera app) and scan this. That's all. This QR works for one device only.</p>
     <canvas id="qron" class="qr"></canvas>
   </div>
-  <details><summary>Local-only QR pairing (no cloud, 2 QR scans)</summary>
+  <details><summary>No internet? Offline pairing (2 scans)</summary>
     <div class="row"><button class="main" id="mkOff">➕ Start offline pairing</button></div>
     <div id="pair" class="card" hidden>
       <p><b>A.</b> On the other device open D Cast → <i>Watch</i> → <i>Scan code</i>, and scan this:</p>
@@ -169,12 +156,13 @@ details{margin:12px 0}summary{cursor:pointer;color:var(--muted);font-size:13.5px
 </section>
 
 <section id="view" hidden>
+  <button class="back" data-home>← Home</button>
   <div id="vsetup">
     <h2>Pair with the sharing device</h2>
-    <p class="hint">Both devices display a QR in turn; scan the offer, then scan the reply to finish local setup.</p>
+    <p class="hint">One scan, one time, on either device.</p>
     <div class="row"><button class="main" id="scanOff">📷 Scan code</button><button class="main" id="vshow">📱 Show QR here</button></div>
     <div id="vqrOn" class="card" hidden>
-      <p>On the sharing device tap <i>Scan other device's QR</i> and scan this. This offer QR is for this pairing session. After scanning, scan the reply QR to finish local setup.</p>
+      <p>On the sharing device tap <i>Scan other device's QR</i> and scan this. This QR works for one device only.</p>
       <canvas id="qrv" class="qr"></canvas>
     </div>
     <div id="vqr" class="card" hidden>
@@ -196,8 +184,6 @@ details{margin:12px 0}summary{cursor:pointer;color:var(--muted);font-size:13.5px
     <div class="pl" id="vlist"></div>
   </div>
 </section>
-</main>
-</div>
 
 <div id="scanner" hidden>
   <video id="cam" muted playsinline></video>
@@ -1106,7 +1092,7 @@ window.QRLib={QRCode:R("index"),QRErrorCorrectLevel:R("QRErrorCorrectLevel")}})(
 <script>
 const $=s=>document.querySelector(s), show=id=>{['home','host','view'].forEach(x=>$('#'+x).hidden=x!==id)};
 const CFG={iceServers:[]}; // offline mode: local network only, no internet needed
-const CFGO=CFG; // local-only mode: no STUN/TURN or cloud signaling
+const CFGO={iceServers:[{urls:'stun:stun.l.google.com:19302'}]}; // one-scan mode
 const fmt=s=>{s=Math.max(0,Math.round(s||0));return(s/60|0)+':'+String(s%60).padStart(2,'0')};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -1152,17 +1138,15 @@ if(!navigator.share)document.querySelectorAll('[data-share]').forEach(b=>b.hidde
 let role='h';const setRole=r=>{role=r;$('#rh').classList.toggle('on',r==='h');$('#rv2').classList.toggle('on',r==='v')};
 $('#rh').onclick=()=>setRole('h');$('#rv2').onclick=()=>setRole('v');
 const enterHost=()=>{show('host');startHost()},enterView=()=>show('view');
-$('#hshow').onclick=()=>{if(role==='h'){enterHost();$('#mkOff').click()}else{enterView();$('#vst').textContent='Local-only mode: the device with the video must display the offer QR first. Scan that QR here, then show the reply QR for the sender to scan.'}};
-$('#hscan0').onclick=()=>{if(role==='h'){enterHost();$('#hscan').click()}else{enterView();$('#scanOff').click()}};
-/* Legacy cloud-room scan handler retained only for compatibility; local pairing uses offer/answer QR codes. */
-const oldHomeScan=()=>scan('Scan the QR on the other device',code=>{
+$('#hshow').onclick=()=>{if(role==='h'){enterHost();$('#mk').click()}else{enterView();$('#vshow').click()}};
+$('#hscan0').onclick=()=>scan('Scan the QR on the other device',code=>{
   const j=parseJoin(code),amViewer=j?j.r==='h':code.trim()[0]==='o';
   if(amViewer){enterView();viewScan(code)}else{enterHost();hostScan(code)}});
 
 
 // ---- one-scan pairing: the QR carries a random single-use room; offer/answer/ICE travel through a tiny relay.
 // Video itself still goes device-to-device. Swap SIG for your own relay if you like.
-const SIG=''; // disabled: local-only pairing never uses a cloud relay
+const SIG='https://ntfy.sh/';
 const rid=()=>btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
 const joinURL=(room,r)=>location.href.split('#')[0].split('?')[0]+'#j='+room+'&r='+r;
 const parseJoin=t=>{const m=/[#&?]j=([\w-]{16,})&r=([hv])/.exec(t||'');return m&&{room:m[1],r:m[2]}};
@@ -1235,8 +1219,8 @@ function hostPair(room,displayer){
     else if(m.t==='ans'&&p&&!p.pc.remoteDescription){try{await p.pc.setRemoteDescription(await dec(m.s));await iceDrain(p)}catch{$('#st').textContent='Pairing reply was invalid. Show a new QR.'}}
     else if(m.t==='ice'&&p)await iceIn(p,m.c)};
   if(displayer){$('#qron').hidden=false;try{drawQR($('#qron'),joinURL(room,'h'))}catch{$('#qron').hidden=true}$('#pairOn').hidden=false;$('#st').textContent='Waiting for the other device to scan…'}
-  else{$('#st').textContent='Connecting…';o.post({t:'hi'});waitReply(o,()=>got,()=>{$('#st').textContent='No reply. Keep the other device\'s QR on screen, and check both devices are on the same Wi-Fi or hotspot and retry the local QR pairing.'})}}
-$('#mk').onclick=()=>$('#mkOff').click();
+  else{$('#st').textContent='Connecting…';o.post({t:'hi'});waitReply(o,()=>got,()=>{$('#st').textContent='No reply. Keep the other device\'s QR on screen, and check both devices have internet (or use offline pairing).'})}}
+$('#mk').onclick=()=>hostPair(rid(),true);
 const hostScan=code=>{const j=parseJoin(code);if(j)hostPair(j.room,false);else takeAnswer(code)};
 $('#hscan').onclick=()=>scan('Scan the QR on the other device',hostScan);
 $('#scanAns').onclick=()=>scan('Scan the QR on the other device',hostScan);
@@ -1267,7 +1251,7 @@ function viewPair(room,displayer){
       catch{$('#vst').textContent='That pairing request was invalid. Try again with a fresh QR.'}}
     else if(m.t==='ice')await iceIn(p,m.c)};
   if(displayer){$('#qrv').hidden=false;try{drawQR($('#qrv'),joinURL(room,'v'))}catch{$('#qrv').hidden=true}$('#vqrOn').hidden=false;$('#vst').textContent='Waiting for the sharing device to scan…'}
-  else{$('#vst').textContent='Connecting…';o.post({t:'hi'});waitReply(o,()=>got,()=>{$('#vst').textContent='No reply. Keep the other device\'s QR on screen, and check both devices are on the same Wi-Fi or hotspot and retry the local QR pairing.'})}}
+  else{$('#vst').textContent='Connecting…';o.post({t:'hi'});waitReply(o,()=>got,()=>{$('#vst').textContent='No reply. Keep the other device\'s QR on screen, and check both devices have internet (or use offline pairing).'})}}
 async function takeOffer(code){
   try{const off=await dec(code);if(off.type!=='offer')throw 0;
     const pc=viewerPc(CFG);
@@ -1278,7 +1262,7 @@ async function takeOffer(code){
   }catch{$('#vst').textContent='That code isn\'t valid. Scan the QR on the sharing device again.'}}
 const viewScan=code=>{const j=parseJoin(code);if(j)viewPair(j.room,false);else takeOffer(code)};
 $('#scanOff').onclick=()=>scan('Scan the QR on the other device',viewScan);
-$('#vshow').onclick=()=>{$('#vst').textContent='Local-only mode: scan the offer QR displayed by the sender. This receiver will then show a reply QR for the sender to scan.'};
+$('#vshow').onclick=()=>viewPair(rid(),true);
 $('#mkAns').onclick=()=>takeOffer($('#offIn').value);
 const cmd=o=>vdc&&vdc.readyState==='open'&&vdc.send(JSON.stringify(o));let paused=false;
 function onState(e){const m=JSON.parse(e.data);paused=m.p;
@@ -1294,27 +1278,36 @@ const idx=()=>[...document.querySelectorAll('#vlist div')].findIndex(d=>d.classL
 $('#pv').onclick=()=>cmd({c:'go',i:idx()-1});$('#nx').onclick=()=>cmd({c:'go',i:idx()+1});
 $('#fs').onclick=()=>(rv.requestFullscreen||rv.webkitRequestFullscreen||(()=>{})).call(rv);
 
+// ================= HOME SCREEN =================
+const ICO=n=>`<svg class="i"><use href="#i-${n}"/></svg>`;
+let tt;const toast=m=>{const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2400)};
+const sheet=o=>$('#sheet').hidden=!o;
+const live=()=>({h:peers.filter(p=>p.pc.connectionState==='connected').length,v:!!(vpc&&vpc.connectionState==='connected')});
+function openSession(){const l=live();if(l.h){enterHost()}else if(l.v){enterView()}else sheet(true)}
+$('#startCast').onclick=()=>enterHost();
+$('#pairNew').onclick=()=>sheet(true);
+$('#sheetX').onclick=()=>sheet(false);
+$('#sheet').onclick=e=>{if(e.target.id==='sheet')sheet(false)};
+['hshow','hscan0'].forEach(id=>$('#'+id).addEventListener('click',()=>sheet(false)));
+$('#viewAll').onclick=openSession;
+$('#cVideos').onclick=()=>{enterHost();if(live().h)$('#pick').click();else toast('Pair a device first, then choose videos')};
+document.querySelectorAll('[data-soon]').forEach(b=>b.onclick=()=>toast(b.dataset.soon+' casting is coming soon. Videos work now.'));
+document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{show('home');renderDevices()});
+document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{const n=b.dataset.nav;
+  if(n==='devices')openSession();else if(n==='cast')enterHost();else if(n!=='home')toast(b.textContent.trim()+' is coming soon')});
+$('#tHelp').onclick=()=>toast('Pair once with a QR, then cast videos. Same Wi-Fi or hotspot works.');
+$('#tSet').onclick=$('#tUser').onclick=()=>toast('Coming soon');
+let lastDev='';
+function renderDevices(){
+  const l=live(),L=[];for(let i=0;i<l.h;i++)L.push(['host','Device '+(i+1),'Receiver','screen']);
+  if(l.v)L.push(['view','Sharing device','Sender','phone']);
+  const h=L.length?L.map(d=>`<button class="dv" data-go="${d[0]}"><div class="th">${ICO(d[3])}</div><div><b>${esc(d[1])}</b><span>${d[2]}</span><em><i></i>Online</em></div></button>`).join('')
+    :`<div class="empty"><span>No paired devices yet. Pair one with a QR to start casting.</span><button class="main" data-pair>Pair New Device</button></div>`;
+  if(h!==lastDev){$('#dl').innerHTML=h;lastDev=h}}
+$('#dl').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.pair!=null)sheet(true);else if(b.dataset.go==='host')enterHost();else if(b.dataset.go==='view')enterView()};
+renderDevices();setInterval(renderDevices,1000);
+
 // opened straight from a scanned QR (e.g. the phone's camera app): join automatically
 {const J=parseJoin(location.hash);if(J){history.replaceState(null,'',location.pathname+location.search);
   if(J.r==='h'){enterView();viewPair(J.room,false)}else{enterHost();hostPair(J.room,false)}}}
-</script>
-<script>
-document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>{
-  const dest=b.dataset.nav;
-  document.querySelectorAll('.navbtn').forEach(n=>n.classList.toggle('active',n.dataset.nav===dest));
-  if(dest==='home'){show('home');return}
-  if(dest==='cast'){if(role==='h'){enterHost();$('#mkOff').click()}else{enterView();$('#vshow').click()}return}
-  if(dest==='devices'){show('home');document.querySelector('.sectionHead').scrollIntoView({behavior:'smooth'});return}
-  if(dest==='history'){show('home');$('#contentNotice').textContent='History is not persisted in this browser build yet. Recent local casts are not uploaded or tracked by a server.';$('#contentNotice').scrollIntoView({behavior:'smooth'});return}
-  if(dest==='settings'){show('home');$('#settingsbox').hidden=false;$('#settingsbox').scrollIntoView({behavior:'smooth'});}
-}));
-document.querySelectorAll('[data-content]').forEach(b=>b.addEventListener('click',()=>{
-  const kind=b.dataset.content;
-  if(kind==='videos'){if(role==='h'){enterHost();$('#hmain').hidden=false;$('#pickbtn').click()}else{enterView();$('#scanOff').click()}return}
-  const labels={photos:'Photo casting is not implemented in this build yet.',music:'Music casting is not implemented in this build yet.',screen:'Browser screen sharing is not implemented in this build yet.'};
-  $('#contentNotice').textContent=labels[kind]+' The current working transport is direct local WebRTC video casting.';
-  $('#contentNotice').scrollIntoView({behavior:'smooth'});
-}));
-</script>
-
-<script>if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('/sw.js').catch(()=>{});</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('/sw.js').catch(()=>{});</script></body></html>
