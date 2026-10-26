@@ -6,45 +6,134 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/logo.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<title>D Cast Direct</title>
+<title>D Cast — Local Casting</title>
 <style>
-:root{--bg:#0f0f0f;--panel:#181818;--panel2:#242424;--text:#f1f1f1;--muted:#aaa;--accent:#ff174f}
+:root{--bg:#070e19;--panel:#111b2a;--panel2:#1b2739;--text:#f4f7ff;--muted:#aab6ce;--accent:#168cff;--accent2:#05c8f2;--line:#243147;--green:#25d366}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Arial,sans-serif;padding:14px;max-width:760px;margin:auto}
-h1{font-weight:300;font-size:24px;margin:4px 0 14px}h1 b{color:var(--accent)}
-h2{font-size:15px;margin:18px 0 6px}
-p,.hint{color:var(--muted);font-size:13.5px;line-height:1.5;margin:6px 0}
-button{border:0;cursor:pointer;background:var(--panel2);color:inherit;border-radius:20px;padding:10px 16px;font:inherit}
-button.main{background:var(--accent);color:#fff}
+body{margin:0;background:radial-gradient(ellipse at 76% 15%,#132a56 0,transparent 34%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;padding:0;max-width:none}
+button{border:1px solid #314057;cursor:pointer;background:var(--panel2);color:inherit;border-radius:12px;padding:11px 16px;font:inherit;transition:transform .15s,border-color .15s}
+button:hover{border-color:#168cff;transform:translateY(-1px)}
+button.main{background:linear-gradient(135deg,#0878f9,#168cff);border-color:#168cff;color:#fff;box-shadow:0 8px 24px #007bff28}
+h1,h2,h3,p{margin-top:0}
+h1{font-size:clamp(27px,3vw,48px);font-weight:800;letter-spacing:-1.5px;margin:0}
+h1 b{color:var(--accent2)}
+h2{font-size:18px;margin:20px 0 10px}
+p,.hint{color:var(--muted);font-size:14px;line-height:1.55;margin:7px 0}
+#appbar{height:76px;display:flex;align-items:center;gap:13px;padding:0 26px;border-bottom:1px solid var(--line);background:#0c1422eF;position:sticky;top:0;z-index:10}
+.brandmark{width:42px;height:42px;border-radius:11px;background:linear-gradient(145deg,#06d8ff,#0878ff);display:grid;place-items:center;font-size:27px;font-weight:900;color:#07152a;font-style:italic}
+#appbar .brand{font-size:25px;font-weight:800;letter-spacing:-.5px}
+.topactions{margin-left:auto;display:flex;gap:8px}
+.topactions button{border:0;background:transparent;font-size:20px;padding:9px}
+#layout{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:calc(100vh - 76px)}
+#sidebar{padding:24px 14px;border-right:1px solid var(--line);background:#09111e}
+.navbtn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:transparent;border:0;padding:14px 16px;margin:0 0 7px;border-radius:12px;color:#b9c6df}
+.navbtn.active{background:linear-gradient(90deg,#087bff,#168cff);color:white;box-shadow:0 8px 22px #087bff2b}
+#main{padding:30px clamp(18px,3.3vw,50px) 40px;min-width:0;max-width:1600px;width:100%;margin:auto}
+#home .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.95fr);align-items:center;gap:24px;min-height:320px;padding:12px 0 24px}
+.heroTitle{font-size:clamp(40px,5.3vw,76px);line-height:1.02;letter-spacing:-2px;font-weight:850;margin:0 0 6px}
+.heroTitle .d{color:#05c7f2}
+.heroSub{font-size:clamp(18px,2vw,28px);font-weight:650;color:#b5c6e8;margin-bottom:14px}
+.heroText{max-width:610px;font-size:15px}
+.heroArt{width:100%;max-height:285px;object-fit:contain;filter:drop-shadow(0 14px 30px #126dff2a)}
+.heroButtons{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.heroButtons button{padding:14px 20px;font-weight:700}
+.sectionHead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.textlink{background:none;border:0;color:#36a5ff;padding:6px}
+.deviceGrid,.contentGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.deviceCard,.contentCard,.infoCard{background:linear-gradient(145deg,#131d2b,#0f1724);border:1px solid #243147;border-radius:15px;padding:17px;min-width:0}
+.deviceCard{display:flex;gap:13px;align-items:center}
+.deviceIcon{width:62px;height:56px;border-radius:10px;background:linear-gradient(145deg,#123a75,#0d8eff);display:grid;place-items:center;font-size:29px;flex-shrink:0}
+.deviceName{font-weight:750;font-size:15px;overflow-wrap:anywhere}
+.deviceType{font-size:13px;color:var(--muted);margin-top:3px}
+.online{color:var(--green);font-size:13px;margin-top:5px}.offline{color:#9aa6bc;font-size:13px;margin-top:5px}
+.contentGrid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.contentCard{display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;min-height:105px}
+.contentIcon{width:58px;height:58px;display:grid;place-items:center;border-radius:14px;font-size:26px;flex-shrink:0}
+.contentCard strong{display:block;font-size:15px}.contentCard small{display:block;color:var(--muted);margin-top:4px;font-size:12px}
+.contentCard .chev{margin-left:auto;font-size:24px;color:#c4d0e5}
+.purple .contentIcon{background:#7b2c94}.blue .contentIcon{background:#075ed2}.green .contentIcon{background:#087e58}.orange .contentIcon{background:#a34a1b}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
 .big{display:block;width:100%;padding:18px;border-radius:14px;margin:10px 0;font-size:17px;text-align:left}
 .big small{display:block;color:var(--muted);font-size:13px;margin-top:4px}
-textarea{width:100%;height:70px;background:#121212;color:var(--text);border:1px solid #303030;border-radius:12px;padding:10px;font:12px monospace;word-break:break-all}
+textarea{width:100%;height:70px;background:#0b1220;color:var(--text);border:1px solid #303f57;border-radius:12px;padding:10px;font:12px monospace;word-break:break-all}
 video{width:100%;background:#000;border-radius:12px;max-height:60vh}
 .role.on{outline:2px solid var(--accent)}.role small{opacity:.7}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
 .pl div{padding:10px 12px;border-radius:10px;background:var(--panel);margin:6px 0;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pl div.on{outline:2px solid var(--accent)}
-#st{padding:8px 12px;border-radius:10px;background:var(--panel);font-size:14px}
+#st{padding:10px 13px;border-radius:10px;background:var(--panel);border:1px solid var(--line);font-size:14px}
 input[type=range]{flex:1;min-width:120px;accent-color:var(--accent)}
 .qr{display:block;width:100%;max-width:440px;margin:10px auto;background:#fff;border-radius:12px;image-rendering:pixelated}
-.card{background:var(--panel);border-radius:14px;padding:12px;margin:10px 0}
 details{margin:12px 0}summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 #scanner{position:fixed;inset:0;background:#000;z-index:30;display:flex;flex-direction:column}
 #scanner video{flex:1;min-height:0;border-radius:0;max-height:none;object-fit:cover}
 #scanner .bar{padding:14px;background:var(--bg);display:flex;gap:10px;align-items:center;justify-content:space-between}
 [hidden]{display:none!important}
+@media(max-width:900px){#layout{grid-template-columns:1fr}#sidebar{display:flex;gap:5px;overflow:auto;padding:8px;border-right:0;border-bottom:1px solid var(--line);position:sticky;top:76px;z-index:9}.navbtn{justify-content:center;white-space:nowrap;width:auto;margin:0;padding:10px 13px}.navbtn span.label{display:none}#main{padding:20px 16px}.deviceGrid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.contentGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){#appbar{height:64px;padding:0 15px}#layout{min-height:calc(100vh - 64px)}#sidebar{top:64px}.brandmark{width:36px;height:36px}.hero{grid-template-columns:1fr!important;gap:8px!important}.heroArt{max-height:190px;grid-row:1}.heroButtons button{flex:1}.contentGrid{gap:8px}.contentCard{padding:12px;gap:9px;min-height:90px}.contentIcon{width:45px;height:45px;font-size:22px}.contentCard strong{font-size:13px}.contentCard small{font-size:11px}.deviceCard{padding:12px}.topactions{gap:0}}
 </style></head><body>
-<h1>D <b>Cast</b> Direct</h1>
-
+<header id="appbar">
+  <div class="brandmark">D</div><div class="brand">D Cast</div>
+  <div class="topactions"><button title="Help" onclick="document.getElementById('helpbox').hidden=!document.getElementById('helpbox').hidden">ⓘ</button><button title="Settings" onclick="document.getElementById('settingsbox').hidden=!document.getElementById('settingsbox').hidden">⚙</button><button title="Profile">●</button></div>
+</header>
+<div id="layout">
+<nav id="sidebar" aria-label="Main navigation">
+  <button class="navbtn active" data-nav="home">⌂ <span class="label">Home</span></button>
+  <button class="navbtn" data-nav="devices">▣ <span class="label">Devices</span></button>
+  <button class="navbtn" data-nav="cast">◉ <span class="label">Cast</span></button>
+  <button class="navbtn" data-nav="history">◷ <span class="label">History</span></button>
+  <button class="navbtn" data-nav="settings">⚙ <span class="label">Settings</span></button>
+</nav>
+<main id="main">
 <section id="home">
-  <p>Cast videos from one device to many others at once. Works with <b>no internet</b>: devices just need the same Wi-Fi (a router without internet is fine) or one phone's hotspot. Scan one QR once (on either device), then play as many videos as you like. Pairing needs internet on both devices; there is also an offline mode.</p>
-  <h2>Pair first</h2>
-  <p class="hint">This device is the…</p>
-  <div class="row"><button class="main role on" id="rh">📤 Sender<small> plays the videos</small></button><button class="main role" id="rv2">📺 Receiver<small> is the screen</small></button></div>
-  <p class="hint">Then scan one QR, once, on either device. Scanning a QR from the other device picks the right role automatically.</p>
-  <div class="row"><button class="main" id="hshow">📱 Show QR</button><button class="main" id="hscan0">📷 Scan QR</button></div>
+  <div class="hero">
+    <div>
+      <div class="heroTitle"><span class="d">D</span> Cast</div>
+      <div class="heroSub">Cast to another device easily</div>
+      <p class="heroText">Stream videos from your device to a paired screen. Use the same Wi-Fi network or one device’s hotspot — mobile data and internet are not required. Media travels directly between devices using WebRTC, not through a cloud video server.</p>
+      <div class="heroButtons">
+        <button class="main" id="hshow">▣ Start Casting</button>
+        <button id="hscan0">⌁ Pair / Scan QR</button>
+      </div>
+      <p class="hint">Local-only mode: show a QR on either device, scan it on the other, then scan the reply QR to complete secure WebRTC setup.</p>
+    </div>
+    <div>
+      <svg class="heroArt" viewBox="0 0 520 300" role="img" aria-label="Phone streaming video directly to a tablet">
+        <defs><linearGradient id="screenGlow" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0c8dff"/><stop offset="1" stop-color="#6d40e8"/></linearGradient><linearGradient id="lake" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fa8e9c"/><stop offset="1" stop-color="#132c66"/></linearGradient></defs>
+        <ellipse cx="285" cy="266" rx="220" ry="17" fill="#007bff" opacity=".16"/>
+        <rect x="195" y="28" width="300" height="222" rx="17" fill="#020712" stroke="#5a6886" stroke-width="4"/>
+        <rect x="205" y="39" width="280" height="200" rx="9" fill="url(#lake)"/>
+        <circle cx="426" cy="69" r="20" fill="#ffcfb0" opacity=".8"/>
+        <path d="M205 157 L260 102 294 133 340 77 398 147 430 119 485 164 V239 H205Z" fill="#25365e"/>
+        <path d="M205 177 L268 137 315 162 367 120 420 163 485 143 V239 H205Z" fill="#102947"/>
+        <path d="M205 198 Q270 184 330 203 T485 194 V239 H205Z" fill="#183b69" opacity=".85"/>
+        <rect x="20" y="76" width="108" height="174" rx="18" fill="#050b17" stroke="#64738f" stroke-width="4"/>
+        <rect x="29" y="91" width="90" height="145" rx="10" fill="url(#screenGlow)"/>
+        <rect x="51" y="139" width="47" height="47" rx="13" fill="#fff" opacity=".18"/>
+        <path d="M68 149 L68 177 L90 163Z" fill="#fff"/>
+        <path d="M143 135 Q168 161 143 187 M160 121 Q196 161 160 201 M178 108 Q225 161 178 214" fill="none" stroke="#08bdf2" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="73" cy="83" r="2" fill="#a9b7d1"/>
+      </svg>
+    </div>
+  </div>
+  <div id="helpbox" class="infoCard" hidden><b>How local casting works</b><p>Both devices must be on the same Wi-Fi or hotspot. No mobile data is needed. One device displays an offer QR; the other scans it and displays a reply QR, which the first device scans. WebRTC then sends the media directly device-to-device.</p></div>
+  <div id="settingsbox" class="infoCard" hidden><b>Connection settings</b><p>Connection mode: <b>Local network only</b>. Cloud signaling and STUN relay mode are not used by the local pairing buttons. Browser camera permission is needed to scan QR codes.</p></div>
+  <div class="sectionHead"><h2>Paired Devices</h2><button class="textlink" data-nav="devices">View all ›</button></div>
+  <div class="deviceGrid">
+    <div class="deviceCard"><div class="deviceIcon">▣</div><div><div class="deviceName" id="thisDeviceName">This Device</div><div class="deviceType">Current browser</div><div class="online">● Ready to pair</div></div></div>
+    <div class="deviceCard"><div class="deviceIcon" style="background:linear-gradient(145deg,#293b55,#536c91)">▰</div><div><div class="deviceName">Receiver</div><div class="deviceType">Android / tablet / PC</div><div class="offline">● Not connected</div></div></div>
+    <div class="deviceCard"><div class="deviceIcon" style="background:linear-gradient(145deg,#402b7d,#8b58dc)">▱</div><div><div class="deviceName">Add a device</div><div class="deviceType">Same Wi-Fi or hotspot</div><div class="online">＋ Pair by QR</div></div></div>
+  </div>
+  <div class="sectionHead"><h2>Cast Content</h2></div>
+  <div class="contentGrid">
+    <button class="contentCard purple" data-content="videos"><span class="contentIcon">▶</span><span><strong>Videos</strong><small>Cast your videos</small></span><span class="chev">›</span></button>
+    <button class="contentCard blue" data-content="photos"><span class="contentIcon">▧</span><span><strong>Photos</strong><small>Photo casting</small></span><span class="chev">›</span></button>
+    <button class="contentCard green" data-content="music"><span class="contentIcon">♫</span><span><strong>Music</strong><small>Audio casting</small></span><span class="chev">›</span></button>
+    <button class="contentCard orange" data-content="screen"><span class="contentIcon">▣</span><span><strong>Screen</strong><small>Share your screen</small></span><span class="chev">›</span></button>
+  </div>
+  <p class="hint" id="contentNotice">Video casting is available in this build. Photos, music, and screen sharing are shown as planned content modes; they require their own media-capture/playback implementation.</p>
 </section>
-
+<div id="navPlaceholder" hidden></div>
 <section id="host" hidden>
   <div id="unsup" class="hint" hidden>This browser can't cast video. Please use Chrome.</div>
   <div id="hmain" hidden>
@@ -59,10 +148,10 @@ details{margin:12px 0}summary{cursor:pointer;color:var(--muted);font-size:13.5px
   <p class="hint">Only <b>one</b> device scans, <b>once</b>. Either show a QR here, or scan the QR shown on the other device.</p>
   <div class="row"><button class="main" id="mk">📱 Show QR here</button><button class="main" id="hscan">📷 Scan other device's QR</button></div>
   <div id="pairOn" class="card" hidden>
-    <p>On the other device open D Cast → <i>Watch</i> → <i>Scan code</i> (or use its normal camera app) and scan this. That's all. This QR works for one device only.</p>
+    <p>On the other device open D Cast → <i>Watch</i> → <i>Scan code</i> (or use its normal camera app) and scan this. That's all. This offer QR is for this pairing session. After scanning, scan the reply QR to finish local setup.</p>
     <canvas id="qron" class="qr"></canvas>
   </div>
-  <details><summary>No internet? Offline pairing (2 scans)</summary>
+  <details><summary>Local-only QR pairing (no cloud, 2 QR scans)</summary>
     <div class="row"><button class="main" id="mkOff">➕ Start offline pairing</button></div>
     <div id="pair" class="card" hidden>
       <p><b>A.</b> On the other device open D Cast → <i>Watch</i> → <i>Scan code</i>, and scan this:</p>
@@ -82,10 +171,10 @@ details{margin:12px 0}summary{cursor:pointer;color:var(--muted);font-size:13.5px
 <section id="view" hidden>
   <div id="vsetup">
     <h2>Pair with the sharing device</h2>
-    <p class="hint">One scan, one time, on either device.</p>
+    <p class="hint">Both devices display a QR in turn; scan the offer, then scan the reply to finish local setup.</p>
     <div class="row"><button class="main" id="scanOff">📷 Scan code</button><button class="main" id="vshow">📱 Show QR here</button></div>
     <div id="vqrOn" class="card" hidden>
-      <p>On the sharing device tap <i>Scan other device's QR</i> and scan this. This QR works for one device only.</p>
+      <p>On the sharing device tap <i>Scan other device's QR</i> and scan this. This offer QR is for this pairing session. After scanning, scan the reply QR to finish local setup.</p>
       <canvas id="qrv" class="qr"></canvas>
     </div>
     <div id="vqr" class="card" hidden>
@@ -107,6 +196,8 @@ details{margin:12px 0}summary{cursor:pointer;color:var(--muted);font-size:13.5px
     <div class="pl" id="vlist"></div>
   </div>
 </section>
+</main>
+</div>
 
 <div id="scanner" hidden>
   <video id="cam" muted playsinline></video>
@@ -1015,7 +1106,7 @@ window.QRLib={QRCode:R("index"),QRErrorCorrectLevel:R("QRErrorCorrectLevel")}})(
 <script>
 const $=s=>document.querySelector(s), show=id=>{['home','host','view'].forEach(x=>$('#'+x).hidden=x!==id)};
 const CFG={iceServers:[]}; // offline mode: local network only, no internet needed
-const CFGO={iceServers:[{urls:'stun:stun.l.google.com:19302'}]}; // one-scan mode
+const CFGO=CFG; // local-only mode: no STUN/TURN or cloud signaling
 const fmt=s=>{s=Math.max(0,Math.round(s||0));return(s/60|0)+':'+String(s%60).padStart(2,'0')};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -1061,15 +1152,17 @@ if(!navigator.share)document.querySelectorAll('[data-share]').forEach(b=>b.hidde
 let role='h';const setRole=r=>{role=r;$('#rh').classList.toggle('on',r==='h');$('#rv2').classList.toggle('on',r==='v')};
 $('#rh').onclick=()=>setRole('h');$('#rv2').onclick=()=>setRole('v');
 const enterHost=()=>{show('host');startHost()},enterView=()=>show('view');
-$('#hshow').onclick=()=>{if(role==='h'){enterHost();$('#mk').click()}else{enterView();$('#vshow').click()}};
-$('#hscan0').onclick=()=>scan('Scan the QR on the other device',code=>{
+$('#hshow').onclick=()=>{if(role==='h'){enterHost();$('#mkOff').click()}else{enterView();$('#vst').textContent='Local-only mode: the device with the video must display the offer QR first. Scan that QR here, then show the reply QR for the sender to scan.'}};
+$('#hscan0').onclick=()=>{if(role==='h'){enterHost();$('#hscan').click()}else{enterView();$('#scanOff').click()}};
+/* Legacy cloud-room scan handler retained only for compatibility; local pairing uses offer/answer QR codes. */
+const oldHomeScan=()=>scan('Scan the QR on the other device',code=>{
   const j=parseJoin(code),amViewer=j?j.r==='h':code.trim()[0]==='o';
   if(amViewer){enterView();viewScan(code)}else{enterHost();hostScan(code)}});
 
 
 // ---- one-scan pairing: the QR carries a random single-use room; offer/answer/ICE travel through a tiny relay.
 // Video itself still goes device-to-device. Swap SIG for your own relay if you like.
-const SIG='https://ntfy.sh/';
+const SIG=''; // disabled: local-only pairing never uses a cloud relay
 const rid=()=>btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
 const joinURL=(room,r)=>location.href.split('#')[0].split('?')[0]+'#j='+room+'&r='+r;
 const parseJoin=t=>{const m=/[#&?]j=([\w-]{16,})&r=([hv])/.exec(t||'');return m&&{room:m[1],r:m[2]}};
@@ -1142,8 +1235,8 @@ function hostPair(room,displayer){
     else if(m.t==='ans'&&p&&!p.pc.remoteDescription){try{await p.pc.setRemoteDescription(await dec(m.s));await iceDrain(p)}catch{$('#st').textContent='Pairing reply was invalid. Show a new QR.'}}
     else if(m.t==='ice'&&p)await iceIn(p,m.c)};
   if(displayer){$('#qron').hidden=false;try{drawQR($('#qron'),joinURL(room,'h'))}catch{$('#qron').hidden=true}$('#pairOn').hidden=false;$('#st').textContent='Waiting for the other device to scan…'}
-  else{$('#st').textContent='Connecting…';o.post({t:'hi'});waitReply(o,()=>got,()=>{$('#st').textContent='No reply. Keep the other device\'s QR on screen, and check both devices have internet (or use offline pairing).'})}}
-$('#mk').onclick=()=>hostPair(rid(),true);
+  else{$('#st').textContent='Connecting…';o.post({t:'hi'});waitReply(o,()=>got,()=>{$('#st').textContent='No reply. Keep the other device\'s QR on screen, and check both devices are on the same Wi-Fi or hotspot and retry the local QR pairing.'})}}
+$('#mk').onclick=()=>$('#mkOff').click();
 const hostScan=code=>{const j=parseJoin(code);if(j)hostPair(j.room,false);else takeAnswer(code)};
 $('#hscan').onclick=()=>scan('Scan the QR on the other device',hostScan);
 $('#scanAns').onclick=()=>scan('Scan the QR on the other device',hostScan);
@@ -1174,7 +1267,7 @@ function viewPair(room,displayer){
       catch{$('#vst').textContent='That pairing request was invalid. Try again with a fresh QR.'}}
     else if(m.t==='ice')await iceIn(p,m.c)};
   if(displayer){$('#qrv').hidden=false;try{drawQR($('#qrv'),joinURL(room,'v'))}catch{$('#qrv').hidden=true}$('#vqrOn').hidden=false;$('#vst').textContent='Waiting for the sharing device to scan…'}
-  else{$('#vst').textContent='Connecting…';o.post({t:'hi'});waitReply(o,()=>got,()=>{$('#vst').textContent='No reply. Keep the other device\'s QR on screen, and check both devices have internet (or use offline pairing).'})}}
+  else{$('#vst').textContent='Connecting…';o.post({t:'hi'});waitReply(o,()=>got,()=>{$('#vst').textContent='No reply. Keep the other device\'s QR on screen, and check both devices are on the same Wi-Fi or hotspot and retry the local QR pairing.'})}}
 async function takeOffer(code){
   try{const off=await dec(code);if(off.type!=='offer')throw 0;
     const pc=viewerPc(CFG);
@@ -1185,7 +1278,7 @@ async function takeOffer(code){
   }catch{$('#vst').textContent='That code isn\'t valid. Scan the QR on the sharing device again.'}}
 const viewScan=code=>{const j=parseJoin(code);if(j)viewPair(j.room,false);else takeOffer(code)};
 $('#scanOff').onclick=()=>scan('Scan the QR on the other device',viewScan);
-$('#vshow').onclick=()=>viewPair(rid(),true);
+$('#vshow').onclick=()=>{$('#vst').textContent='Local-only mode: scan the offer QR displayed by the sender. This receiver will then show a reply QR for the sender to scan.'};
 $('#mkAns').onclick=()=>takeOffer($('#offIn').value);
 const cmd=o=>vdc&&vdc.readyState==='open'&&vdc.send(JSON.stringify(o));let paused=false;
 function onState(e){const m=JSON.parse(e.data);paused=m.p;
@@ -1204,4 +1297,24 @@ $('#fs').onclick=()=>(rv.requestFullscreen||rv.webkitRequestFullscreen||(()=>{})
 // opened straight from a scanned QR (e.g. the phone's camera app): join automatically
 {const J=parseJoin(location.hash);if(J){history.replaceState(null,'',location.pathname+location.search);
   if(J.r==='h'){enterView();viewPair(J.room,false)}else{enterHost();hostPair(J.room,false)}}}
-</script><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('/sw.js').catch(()=>{});</script></body></html>
+</script>
+<script>
+document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>{
+  const dest=b.dataset.nav;
+  document.querySelectorAll('.navbtn').forEach(n=>n.classList.toggle('active',n.dataset.nav===dest));
+  if(dest==='home'){show('home');return}
+  if(dest==='cast'){if(role==='h'){enterHost();$('#mkOff').click()}else{enterView();$('#vshow').click()}return}
+  if(dest==='devices'){show('home');document.querySelector('.sectionHead').scrollIntoView({behavior:'smooth'});return}
+  if(dest==='history'){show('home');$('#contentNotice').textContent='History is not persisted in this browser build yet. Recent local casts are not uploaded or tracked by a server.';$('#contentNotice').scrollIntoView({behavior:'smooth'});return}
+  if(dest==='settings'){show('home');$('#settingsbox').hidden=false;$('#settingsbox').scrollIntoView({behavior:'smooth'});}
+}));
+document.querySelectorAll('[data-content]').forEach(b=>b.addEventListener('click',()=>{
+  const kind=b.dataset.content;
+  if(kind==='videos'){if(role==='h'){enterHost();$('#hmain').hidden=false;$('#pickbtn').click()}else{enterView();$('#scanOff').click()}return}
+  const labels={photos:'Photo casting is not implemented in this build yet.',music:'Music casting is not implemented in this build yet.',screen:'Browser screen sharing is not implemented in this build yet.'};
+  $('#contentNotice').textContent=labels[kind]+' The current working transport is direct local WebRTC video casting.';
+  $('#contentNotice').scrollIntoView({behavior:'smooth'});
+}));
+</script>
+
+<script>if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('/sw.js').catch(()=>{});</script></body></html>
