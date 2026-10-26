@@ -20,6 +20,7 @@ button.main{background:var(--accent);color:#fff}
 .big small{display:block;color:var(--muted);font-size:13px;margin-top:4px}
 textarea{width:100%;height:70px;background:#121212;color:var(--text);border:1px solid #303030;border-radius:12px;padding:10px;font:12px monospace;word-break:break-all}
 video{width:100%;background:#000;border-radius:12px;max-height:60vh}
+.role.on{outline:2px solid var(--accent)}.role small{opacity:.7}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
 .pl div{padding:10px 12px;border-radius:10px;background:var(--panel);margin:6px 0;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pl div.on{outline:2px solid var(--accent)}
@@ -36,47 +37,63 @@ details{margin:12px 0}summary{cursor:pointer;color:var(--muted);font-size:13.5px
 <h1>D <b>Cast</b> Direct</h1>
 
 <section id="home">
-  <p>Cast videos from one device to many others at once. Works with <b>no internet</b>: devices just need the same Wi-Fi (a router without internet is fine) or one phone's hotspot. Pair each device once with a QR code, then play as many videos as you like.</p>
-  <button class="big" id="bh">📤 Share my videos<small>This device plays the videos</small></button>
-  <button class="big" id="bv">📺 Watch from another device<small>This device is the screen</small></button>
+  <p>Cast videos from one device to many others at once. Works with <b>no internet</b>: devices just need the same Wi-Fi (a router without internet is fine) or one phone's hotspot. Scan one QR once (on either device), then play as many videos as you like. Pairing needs internet on both devices; there is also an offline mode.</p>
+  <h2>Pair first</h2>
+  <p class="hint">This device is the…</p>
+  <div class="row"><button class="main role on" id="rh">📤 Sender<small> plays the videos</small></button><button class="main role" id="rv2">📺 Receiver<small> is the screen</small></button></div>
+  <p class="hint">Then scan one QR, once, on either device. Scanning a QR from the other device picks the right role automatically.</p>
+  <div class="row"><button class="main" id="hshow">📱 Show QR</button><button class="main" id="hscan0">📷 Scan QR</button></div>
 </section>
 
 <section id="host" hidden>
   <div id="unsup" class="hint" hidden>This browser can't cast video. Please use Chrome.</div>
-  <h2>1. Choose videos</h2>
+  <div id="hmain" hidden>
+  <h2>Choose videos</h2>
   <div class="row"><button class="main" id="pickbtn">Choose videos…</button>
   <input id="pick" type="file" accept="video/*" multiple hidden></div>
   <video id="hv" controls playsinline></video>
   <div class="pl" id="hlist"></div>
+  </div>
 
-  <h2>2. Pair devices (once per device)</h2>
-  <div class="row"><button class="main" id="mk">➕ Add a device</button></div>
-  <div id="pair" class="card" hidden>
-    <p><b>A.</b> On the other device open D Cast → <i>Watch</i> → <i>Scan code</i>, and scan this:</p>
-    <canvas id="qro" class="qr"></canvas>
-    <p><b>B.</b> It will then show its own QR. Scan that one here:</p>
-    <div class="row"><button class="main" id="scanAns">📷 Scan its reply</button></div>
-    <details><summary>Can't scan? Use text codes</summary>
+  <h2>Connect a device (one scan, one time)</h2>
+  <p class="hint">Only <b>one</b> device scans, <b>once</b>. Either show a QR here, or scan the QR shown on the other device.</p>
+  <div class="row"><button class="main" id="mk">📱 Show QR here</button><button class="main" id="hscan">📷 Scan other device's QR</button></div>
+  <div id="pairOn" class="card" hidden>
+    <p>On the other device open D Cast → <i>Watch</i> → <i>Scan code</i> (or use its normal camera app) and scan this. That's all. This QR works for one device only.</p>
+    <canvas id="qron" class="qr"></canvas>
+  </div>
+  <details><summary>No internet? Offline pairing (2 scans)</summary>
+    <div class="row"><button class="main" id="mkOff">➕ Start offline pairing</button></div>
+    <div id="pair" class="card" hidden>
+      <p><b>A.</b> On the other device open D Cast → <i>Watch</i> → <i>Scan code</i>, and scan this:</p>
+      <canvas id="qro" class="qr"></canvas>
+      <p><b>B.</b> It will then show its own QR. Scan that one here:</p>
+      <div class="row"><button class="main" id="scanAns">📷 Scan its reply</button></div>
       <textarea id="offer" readonly></textarea>
       <div class="row"><button data-copy="offer">Copy</button><button data-share="offer">Share</button></div>
-      <p>Paste its reply code:</p><textarea id="ansIn"></textarea>
+      <p>Or paste its reply code:</p><textarea id="ansIn"></textarea>
       <div class="row"><button id="conn">Connect</button></div>
-    </details>
-  </div>
+    </div>
+  </details>
   <div id="st">No devices connected yet</div>
-  <p class="hint">Paired devices stay connected: switch videos freely, no re-pairing. Repeat step 2 for each extra device; all watch together. Keep this screen on. A phone can feed about 3 devices; a PC more.</p>
+  <p class="hint">Paired devices stay connected: switch videos freely, no re-pairing. Repeat step 2 for each extra device (one scan each); all watch together. Keep this screen on. A phone can feed about 3 devices; a PC more.</p>
 </section>
 
 <section id="view" hidden>
   <div id="vsetup">
     <h2>Pair with the sharing device</h2>
-    <div class="row"><button class="main" id="scanOff">📷 Scan code</button></div>
+    <p class="hint">One scan, one time, on either device.</p>
+    <div class="row"><button class="main" id="scanOff">📷 Scan code</button><button class="main" id="vshow">📱 Show QR here</button></div>
+    <div id="vqrOn" class="card" hidden>
+      <p>On the sharing device tap <i>Scan other device's QR</i> and scan this. This QR works for one device only.</p>
+      <canvas id="qrv" class="qr"></canvas>
+    </div>
     <div id="vqr" class="card" hidden>
-      <p>Now show this QR to the sharing device (it taps <i>Scan its reply</i>):</p>
+      <p>Offline mode: show this QR to the sharing device (it taps <i>Scan its reply</i>):</p>
       <canvas id="qra" class="qr"></canvas>
     </div>
     <div id="vst" class="hint"></div>
-    <details><summary>Can't scan? Use text codes</summary>
+    <details><summary>Can't scan? Use text codes (offline mode)</summary>
       <p>Paste the code from the sharing device:</p><textarea id="offIn"></textarea>
       <div class="row"><button id="mkAns">Make reply code</button></div>
       <textarea id="ans" readonly placeholder="Your reply code appears here"></textarea>
@@ -997,7 +1014,8 @@ module.exports = QRCode;
 window.QRLib={QRCode:R("index"),QRErrorCorrectLevel:R("QRErrorCorrectLevel")}})();</script>
 <script>
 const $=s=>document.querySelector(s), show=id=>{['home','host','view'].forEach(x=>$('#'+x).hidden=x!==id)};
-const CFG={iceServers:[]}; // no STUN/TURN: local network only, no internet needed
+const CFG={iceServers:[]}; // offline mode: local network only, no internet needed
+const CFGO={iceServers:[{urls:'stun:stun.l.google.com:19302'}]}; // one-scan mode
 const fmt=s=>{s=Math.max(0,Math.round(s||0));return(s/60|0)+':'+String(s%60).padStart(2,'0')};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -1040,8 +1058,32 @@ document.addEventListener('click',async e=>{
   e.target.textContent='Copied ✓';setTimeout(()=>e.target.textContent=c?'Copy':'Share',1500)});
 if(!navigator.share)document.querySelectorAll('[data-share]').forEach(b=>b.hidden=true);
 
-$('#bh').onclick=()=>{show('host');startHost()};
-$('#bv').onclick=()=>show('view');
+let role='h';const setRole=r=>{role=r;$('#rh').classList.toggle('on',r==='h');$('#rv2').classList.toggle('on',r==='v')};
+$('#rh').onclick=()=>setRole('h');$('#rv2').onclick=()=>setRole('v');
+const enterHost=()=>{show('host');startHost()},enterView=()=>show('view');
+$('#hshow').onclick=()=>{if(role==='h'){enterHost();$('#mk').click()}else{enterView();$('#vshow').click()}};
+$('#hscan0').onclick=()=>scan('Scan the QR on the other device',code=>{
+  const j=parseJoin(code),amViewer=j?j.r==='h':code.trim()[0]==='o';
+  if(amViewer){enterView();viewScan(code)}else{enterHost();hostScan(code)}});
+
+
+// ---- one-scan pairing: the QR carries a random single-use room; offer/answer/ICE travel through a tiny relay.
+// Video itself still goes device-to-device. Swap SIG for your own relay if you like.
+const SIG='https://ntfy.sh/';
+const rid=()=>btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+const joinURL=(room,r)=>location.href.split('#')[0].split('?')[0]+'#j='+room+'&r='+r;
+const parseJoin=t=>{const m=/[#&?]j=([\w-]{16,})&r=([hv])/.exec(t||'');return m&&{room:m[1],r:m[2]}};
+function openRoom(room){
+  const me=rid().slice(0,8),url=SIG+'dc'+room,o={me,on(){},closed:false};
+  const es=new EventSource(url+'/sse?since=10m');
+  es.onmessage=e=>{try{const ev=JSON.parse(e.data);if(ev.event!=='message')return;const m=JSON.parse(ev.message);if(m.f!==me)o.on(m)}catch{}};
+  o.post=m=>fetch(url,{method:'POST',body:JSON.stringify(Object.assign({f:me},m))}).catch(()=>{});
+  o.close=()=>{o.closed=true;es.close()};return o}
+function wireIce(pc,o){let buf=[],tm;const flush=()=>{clearTimeout(tm);if(buf.length)o.post({t:'ice',c:buf});buf=[]};
+  pc.onicecandidate=e=>{if(!e.candidate)return flush();buf.push(e.candidate.toJSON());clearTimeout(tm);tm=setTimeout(flush,250)}}
+async function iceIn(p,list){for(const c of list||[]){if(p.pc&&p.pc.remoteDescription)try{await p.pc.addIceCandidate(c)}catch{}else(p.q=p.q||[]).push(c)}}
+async function iceDrain(p){while(p.q&&p.q.length)try{await p.pc.addIceCandidate(p.q.shift())}catch{}}
+function waitReply(o,get,msg){const t=setTimeout(()=>{if(!o.closed&&!get())msg()},15000);return()=>clearTimeout(t)}
 
 // ================= HOST (plays + casts to many devices) =================
 const hv=$('#hv');let files=[],cur=-1,cap,peers=[],pend=null;
@@ -1062,9 +1104,9 @@ function send(full,only){const m=JSON.stringify({n:full?files.map(f=>f.name):und
   (only?[only]:peers).forEach(p=>p.dc.readyState==='open'&&p.dc.send(m))}
 setInterval(()=>send(false),500);hv.onpause=hv.onplay=()=>send(false);
 function status(){const n=peers.filter(p=>p.pc.connectionState==='connected').length;
-  $('#st').textContent=n?`✅ ${n} device${n>1?'s':''} watching. Tap "Add a device" to pair another.`:(pend?'Waiting for the other device…':'No devices connected yet')}
-function newPeer(){
-  const pc=new RTCPeerConnection(CFG),v=pc.addTransceiver('video',{direction:'sendonly'}),a=pc.addTransceiver('audio',{direction:'sendonly'});
+  $('#st').textContent=n?`✅ ${n} device${n>1?'s':''} watching. Show or scan a QR to add another.`:(pend?'Waiting for the other device…':'No devices connected yet')}
+function newPeer(cfg){
+  const pc=new RTCPeerConnection(cfg||CFG),v=pc.addTransceiver('video',{direction:'sendonly'}),a=pc.addTransceiver('audio',{direction:'sendonly'});
   try{v.setCodecPreferences(RTCRtpSender.getCapabilities('video').codecs.filter(c=>c.mimeType==='video/VP8'));
       a.setCodecPreferences(RTCRtpSender.getCapabilities('audio').codecs.filter(c=>c.mimeType==='audio/opus'))}catch{}
   const p={pc,snd:{video:v.sender,audio:a.sender}};
@@ -1073,39 +1115,77 @@ function newPeer(){
     if(m.c==='play')hv.play();else if(m.c==='pause')hv.pause();else if(m.c==='seek')hv.currentTime=m.t;else if(m.c==='go')go(m.i)};
   pc.onconnectionstatechange=async()=>{const s=pc.connectionState;
     if(s==='connected'){try{const q=p.snd.video.getParameters();if(!q.encodings||!q.encodings.length)q.encodings=[{}];q.encodings[0].maxBitrate=5e6;await p.snd.video.setParameters(q)}catch{}
-      if(pend===p){pend=null;$('#pair').hidden=true;$('#offer').value='';$('#ansIn').value=''}}
-    if(s==='failed'||s==='closed'){peers=peers.filter(x=>x!==p);if(pend===p){pend=null;$('#st').textContent='❌ Pairing failed. Tap "Add a device" and try again (same Wi-Fi? see tips).';return}}
+      $('#hmain').hidden=false;if(p.o)p.o.close();if(pend===p){pend=null;$('#pair').hidden=true;$('#pairOn').hidden=true;$('#offer').value='';$('#ansIn').value=''}}
+    if(s==='failed'||s==='closed'){peers=peers.filter(x=>x!==p);if(p.o)p.o.close();if(pend===p){pend=null;$('#st').textContent='❌ Pairing failed. Show a new QR and try again (internet on both devices, or use offline pairing).';return}}
     status()};
   peers.push(p);attach();return p}
-$('#mk').onclick=async()=>{
-  if(!cap)return;if(pend){pend.pc.close();peers=peers.filter(x=>x!==pend)}
-  const p=pend=newPeer();$('#ansIn').value='';
+function dropPend(){if(pend){if(pend.o)pend.o.close();pend.pc.close();peers=peers.filter(x=>x!==pend);pend=null}if(hostRoom){hostRoom.close();hostRoom=null}}
+let hostRoom=null;
+$('#mkOff').onclick=async()=>{
+  if(!cap)return;dropPend()
+  const p=pend=newPeer();$('#ansIn').value='';$('#pairOn').hidden=true;
   await p.pc.setLocalDescription(await p.pc.createOffer());await gathered(p.pc);
   const code=await enc(p.pc.localDescription);$('#offer').value=code;$('#pair').hidden=false;
   try{drawQR($('#qro'),code)}catch{$('#qro').hidden=true}status()};
 async function takeAnswer(code){if(!pend)return;
   try{const d=await dec(code);if(d.type!=='answer')throw 0;await pend.pc.setRemoteDescription(d);$('#st').textContent='Connecting…'}
   catch{$('#st').textContent='That reply isn\'t valid. Tap "Add a device" for a fresh QR and try again.'}}
-$('#scanAns').onclick=()=>scan('Scan the QR on the other device',takeAnswer);
+function hostPair(room,displayer){
+  if(!cap)return;dropPend();const o=hostRoom=openRoom(room);let locked=null,p=null,got=false;
+  const begin=async()=>{p=pend=newPeer(CFGO);p.o=o;wireIce(p.pc,o);
+    await p.pc.setLocalDescription(await p.pc.createOffer());o.post({t:'off',s:await enc(p.pc.localDescription)});status()};
+  o.on=async m=>{
+    if(m.t==='hi'&&locked&&m.f!==locked){o.post({t:'busy',to:m.f});return}
+    if(m.t==='busy'){if(!got){got=true;$('#st').textContent='That QR was already used by another device. Show a new QR.';o.close()}return}
+    if(locked&&m.f!==locked)return;
+    if((displayer&&m.t==='hi')||(!displayer&&m.t==='ack')){if(locked)return;locked=m.f;got=true;$('#st').textContent='Connecting…';$('#pairOn').hidden=true;await begin()}
+    else if(m.t==='ans'&&p&&!p.pc.remoteDescription){try{await p.pc.setRemoteDescription(await dec(m.s));await iceDrain(p)}catch{$('#st').textContent='Pairing reply was invalid. Show a new QR.'}}
+    else if(m.t==='ice'&&p)await iceIn(p,m.c)};
+  if(displayer){$('#qron').hidden=false;try{drawQR($('#qron'),joinURL(room,'h'))}catch{$('#qron').hidden=true}$('#pairOn').hidden=false;$('#st').textContent='Waiting for the other device to scan…'}
+  else{$('#st').textContent='Connecting…';o.post({t:'hi'});waitReply(o,()=>got,()=>{$('#st').textContent='No reply. Keep the other device\'s QR on screen, and check both devices have internet (or use offline pairing).'})}}
+$('#mk').onclick=()=>hostPair(rid(),true);
+const hostScan=code=>{const j=parseJoin(code);if(j)hostPair(j.room,false);else takeAnswer(code)};
+$('#hscan').onclick=()=>scan('Scan the QR on the other device',hostScan);
+$('#scanAns').onclick=()=>scan('Scan the QR on the other device',hostScan);
 $('#conn').onclick=()=>takeAnswer($('#ansIn').value);
 
 // ================= VIEWER (screen + remote) =================
 const rv=$('#rv'),rs=new MediaStream();rv.srcObject=rs;let vpc,vdc,drag=false;
+function viewerPc(cfg){
+  if(vpc)vpc.close();const pc=vpc=new RTCPeerConnection(cfg);
+  pc.ontrack=e=>{if(!rs.getTracks().includes(e.track))rs.addTrack(e.track);rv.play().catch(()=>{})};
+  pc.ondatachannel=e=>{vdc=e.channel;vdc.onmessage=onState};
+  pc.onconnectionstatechange=()=>{const s=pc.connectionState;
+    if(s==='connected'){if(vroom){vroom.close();vroom=null}$('#vsetup').hidden=true;$('#vplay').hidden=false;rv.play().catch(()=>{})}
+    else if(s==='failed'||s==='disconnected'){$('#vsetup').hidden=false;$('#vplay').hidden=true;$('#vqr').hidden=true;$('#vqrOn').hidden=true;$('#vst').textContent='Connection lost. Scan a new QR to pair again.'}
+    else $('#vst').textContent='Connecting…'};
+  return pc}
+let vroom=null;
+function viewPair(room,displayer){
+  if(vroom)vroom.close();const o=vroom=openRoom(room);let locked=null,p={q:[]},got=false;
+  o.on=async m=>{
+    if(m.t==='hi'&&locked&&m.f!==locked){o.post({t:'busy',to:m.f});return}
+    if(m.t==='busy'){if(!got){got=true;$('#vst').textContent='That QR was already used by another device. Show a new QR.';o.close()}return}
+    if(locked&&m.f!==locked)return;
+    if(displayer&&m.t==='hi'){if(locked)return;locked=m.f;got=true;$('#vqrOn').hidden=true;$('#vst').textContent='Connecting…';o.post({t:'ack'})}
+    else if(m.t==='off'){if(p.pc)return;if(!locked)locked=m.f;got=true;
+      try{p.pc=viewerPc(CFGO);wireIce(p.pc,o);await p.pc.setRemoteDescription(await dec(m.s));await iceDrain(p);
+        await p.pc.setLocalDescription(await p.pc.createAnswer());o.post({t:'ans',s:await enc(p.pc.localDescription)});$('#vqrOn').hidden=true}
+      catch{$('#vst').textContent='That pairing request was invalid. Try again with a fresh QR.'}}
+    else if(m.t==='ice')await iceIn(p,m.c)};
+  if(displayer){$('#qrv').hidden=false;try{drawQR($('#qrv'),joinURL(room,'v'))}catch{$('#qrv').hidden=true}$('#vqrOn').hidden=false;$('#vst').textContent='Waiting for the sharing device to scan…'}
+  else{$('#vst').textContent='Connecting…';o.post({t:'hi'});waitReply(o,()=>got,()=>{$('#vst').textContent='No reply. Keep the other device\'s QR on screen, and check both devices have internet (or use offline pairing).'})}}
 async function takeOffer(code){
   try{const off=await dec(code);if(off.type!=='offer')throw 0;
-    if(vpc)vpc.close();vpc=new RTCPeerConnection(CFG);
-    vpc.ontrack=e=>{if(!rs.getTracks().includes(e.track))rs.addTrack(e.track);rv.play().catch(()=>{})};
-    vpc.ondatachannel=e=>{vdc=e.channel;vdc.onmessage=onState};
-    vpc.onconnectionstatechange=()=>{const s=vpc.connectionState;
-      if(s==='connected'){$('#vsetup').hidden=true;$('#vplay').hidden=false;rv.play().catch(()=>{})}
-      else if(s==='failed'||s==='disconnected'){$('#vsetup').hidden=false;$('#vplay').hidden=true;$('#vqr').hidden=true;$('#vst').textContent='Connection lost. Scan the sharing device\'s new QR to pair again.'}
-      else $('#vst').textContent='Connecting…'};
-    await vpc.setRemoteDescription(off);await vpc.setLocalDescription(await vpc.createAnswer());await gathered(vpc);
-    const a=await enc(vpc.localDescription);$('#ans').value=a;$('#vqr').hidden=false;
+    const pc=viewerPc(CFG);
+    await pc.setRemoteDescription(off);await pc.setLocalDescription(await pc.createAnswer());await gathered(pc);
+    const a=await enc(pc.localDescription);$('#ans').value=a;$('#vqr').hidden=false;
     try{drawQR($('#qra'),a)}catch{$('#qra').hidden=true}
     $('#vst').textContent='Show the QR above to the sharing device (or use text codes).';
   }catch{$('#vst').textContent='That code isn\'t valid. Scan the QR on the sharing device again.'}}
-$('#scanOff').onclick=()=>scan('Scan the QR on the sharing device',takeOffer);
+const viewScan=code=>{const j=parseJoin(code);if(j)viewPair(j.room,false);else takeOffer(code)};
+$('#scanOff').onclick=()=>scan('Scan the QR on the other device',viewScan);
+$('#vshow').onclick=()=>viewPair(rid(),true);
 $('#mkAns').onclick=()=>takeOffer($('#offIn').value);
 const cmd=o=>vdc&&vdc.readyState==='open'&&vdc.send(JSON.stringify(o));let paused=false;
 function onState(e){const m=JSON.parse(e.data);paused=m.p;
@@ -1120,4 +1200,8 @@ $('#vlist').onclick=e=>{const i=e.target.dataset.i;if(i!=null)cmd({c:'go',i:+i})
 const idx=()=>[...document.querySelectorAll('#vlist div')].findIndex(d=>d.classList.contains('on'));
 $('#pv').onclick=()=>cmd({c:'go',i:idx()-1});$('#nx').onclick=()=>cmd({c:'go',i:idx()+1});
 $('#fs').onclick=()=>(rv.requestFullscreen||rv.webkitRequestFullscreen||(()=>{})).call(rv);
+
+// opened straight from a scanned QR (e.g. the phone's camera app): join automatically
+{const J=parseJoin(location.hash);if(J){history.replaceState(null,'',location.pathname+location.search);
+  if(J.r==='h'){enterView();viewPair(J.room,false)}else{enterHost();hostPair(J.room,false)}}}
 </script><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('/sw.js').catch(()=>{});</script></body></html>
